@@ -1,0 +1,17 @@
+* Remove shared config
+
+Boot strap applications with Play config
+
+Need thrall to start and create the empty elastic index.
+
+* Add basic thrall application.conf
+
+Grid Play version only works with Java 8
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/
+
+sbt thrall/run
+
+domain.root not found because CommonConfig is looking for Guardian native properties files.
+
+Want CommonConfig to respect Play config or the Play app to be able to bypass CommonConfig.
+ThrallConfig has a reference to Play config should do as much as it can from this rather than CommonConfig.
