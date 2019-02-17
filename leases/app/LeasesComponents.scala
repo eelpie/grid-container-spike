@@ -7,7 +7,7 @@ import router.Routes
 
 class LeasesComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new LeasesConfig(configuration)
-  val services = new Services(config.domainRoot, config.isProd)
+  val services = new Services(config)
 
   val store = new LeaseStore(config)
   val notifications = new LeaseNotifier(config, store)

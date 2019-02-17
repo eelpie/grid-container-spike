@@ -1,7 +1,9 @@
 package com.gu.mediaservice.lib.config
 
-class Services(val domainRoot: String, isProd: Boolean) {
+class Services(val config: CommonConfig) {
   val appName = "media"
+
+  val domainRoot = config.domainRoot
 
   val kahunaHost: String   = s"$appName.$domainRoot"
   val apiHost: String      = s"api.$appName.$domainRoot"
@@ -27,7 +29,7 @@ class Services(val domainRoot: String, isProd: Boolean) {
 
   val guardianWitnessBaseUri: String = "https://n0ticeapis.com"
 
-  val toolsDomains: Set[String] = if(isProd) {
+  val toolsDomains: Set[String] = if(config.isProd) {
     Set(domainRoot)
   } else {
     Set(

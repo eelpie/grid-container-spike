@@ -9,7 +9,7 @@ import router.Routes
 
 class KahunaComponents(context: Context) extends GridComponents(context) with AssetsComponents {
   final override lazy val config = new KahunaConfig(configuration)
-  val services = new Services(config.domainRoot, config.isProd)
+  val services = new Services(config)
 
   final override lazy val securityHeadersConfig: SecurityHeadersConfig = KahunaSecurityConfig(config, context.initialConfiguration, services)
 

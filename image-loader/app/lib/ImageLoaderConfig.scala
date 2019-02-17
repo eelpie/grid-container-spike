@@ -9,7 +9,7 @@ class ImageLoaderConfig(override val configuration: Configuration) extends Commo
 
   final override lazy val appName = "image-loader"
 
-  val services = new Services(this.domainRoot, this.isProd)
+  val services = new Services(this)
 
   val topicArn: String = properties("sns.topic.arn")
 

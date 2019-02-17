@@ -12,7 +12,7 @@ class LeasesConfig(override val configuration: Configuration) extends CommonConf
 
   final override lazy val appName = "leases"
 
-  val services = new Services(this.domainRoot, this.isProd)
+  val services = new Services(this)
 
   val topicArn = properties("sns.topic.arn")
 

@@ -13,7 +13,7 @@ class ThrallComponents(context: Context) extends GridComponents(context) {
 
   final override lazy val config = new ThrallConfig(configuration)
 
-  val services = new Services(config.domainRoot, config.isProd)
+  val services = new Services(config)
 
   val store = new ThrallStore(config)
   val dynamoNotifications = new DynamoNotifications(config)

@@ -16,7 +16,7 @@ class MediaApiConfig(override val configuration: Configuration) extends CommonCo
 
   final override lazy val appName = "media-api"
 
-  val services = new Services(this.domainRoot, this.isProd)
+  val services = new Services(this)
 
   lazy val keyStoreBucket: String = properties("auth.keystore.bucket")
 

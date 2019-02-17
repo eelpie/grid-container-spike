@@ -14,7 +14,7 @@ import router.Routes
 
 class MediaApiComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new MediaApiConfig(configuration)
-  val services = new Services(config.domainRoot, config.isProd)
+  val services = new Services(config)
 
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 

@@ -10,7 +10,7 @@ class CollectionsConfig(override val configuration: Configuration)(implicit ec: 
 
   override lazy val appName = "collections"
 
-  val services = new Services(this.domainRoot, this.isProd)
+  val services = new Services(this)
 
   val collectionsTable = properties("dynamo.table.collections")
   val imageCollectionsTable = properties("dynamo.table.imageCollections")

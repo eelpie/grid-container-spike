@@ -7,7 +7,7 @@ class KahunaConfig(override val configuration: Configuration) extends CommonConf
 
   final override lazy val appName = "kahuna"
 
-  val services = new Services(this.domainRoot, this.isProd)
+  val services = new Services(this)
 
   val rootUri: String = services.kahunaBaseUri
   val mediaApiUri: String = services.apiBaseUri

@@ -8,7 +8,7 @@ import router.Routes
 
 class MetadataEditorComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new EditsConfig(configuration, services)
-  val services = new Services(config.domainRoot, config.isProd)
+  val services = new Services(config)
 
   val store = new EditsStore(config)
   val notifications = new Notifications(config)

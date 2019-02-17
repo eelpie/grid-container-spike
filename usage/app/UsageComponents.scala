@@ -14,8 +14,7 @@ class UsageComponents(context: Context) extends GridComponents(context) {
 
   // TODO try to remove lazy vals where possible
   // Note: had to make these lazy to avoid init order problems
-  lazy val domainRoot: String = config.properties("domain.root")
-  lazy val services = new Services(domainRoot, config.isProd)
+  lazy val services = new Services(config)
 
   val usageMetadataBuilder = new UsageMetadataBuilder(config)
   val mediaWrapper = new MediaWrapperOps(usageMetadataBuilder)

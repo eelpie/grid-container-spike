@@ -9,7 +9,7 @@ class AuthConfig(override val configuration: Configuration)(implicit ec: Executi
 
   override lazy val appName = "auth"
 
-  val services = new Services(this.domainRoot, this.isProd)
+  val services = new Services(this)
 
   val rootUri: String = services.authBaseUri
   val mediaApiUri: String = services.apiBaseUri
