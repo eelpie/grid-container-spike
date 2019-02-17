@@ -10,6 +10,7 @@ import com.gu.mediaservice.lib.argo.model.Link
 import com.gu.mediaservice.lib.auth.Authentication.Principal
 import com.gu.mediaservice.lib.auth._
 import com.gu.mediaservice.lib.aws.UpdateMessage
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.imaging.ExportResult
 import com.gu.mediaservice.model._
 import lib._
@@ -26,7 +27,7 @@ case object ApiRequestFailed extends Exception("Failed to fetch the source")
 
 class CropperController(auth: Authentication, crops: Crops, store: CropStore, notifications: Notifications,
                         override val config: CropperConfig,
-                        override val controllerComponents: ControllerComponents)(implicit val ec: ExecutionContext)
+                        override val controllerComponents: ControllerComponents, services: Services)(implicit val ec: ExecutionContext)
   extends BaseController with ArgoHelpers with PermissionsHandler {
 
   // Stupid name clash between Argo and Play
@@ -38,7 +39,7 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
   val indexResponse = {
     val indexData = Map("description" -> "This is the Cropper Service")
     val indexLinks = List(
-      Link("crop", s"${config.rootUri}/crops")
+      Link("crop", s"${services.cropperBaseUri}/crops")
     )
     respond(indexData, indexLinks)
   }
@@ -85,7 +86,7 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
 
     store.listCrops(id) map (_.toList) map { crops =>
       val deleteCropsAction =
-        ArgoAction("delete-crops", URI.create(s"${config.rootUri}/crops/$id"), "DELETE")
+        ArgoAction("delete-crops", URI.create(s"${services.cropperBaseUri}/crops/$id"), "DELETE")
 
       val links = (for {
         crop <- crops.headOption
@@ -137,7 +138,7 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
     } yield (id, finalCrop)
 
   // TODO: lame, parse into URI object and compare host instead
-  def isMediaApiUri(uri: String): Boolean = uri.startsWith(config.apiUri)
+  def isMediaApiUri(uri: String): Boolean = uri.startsWith(services.apiBaseUri)
 
   import org.apache.http.client.methods.HttpGet
   import org.apache.http.client.utils.URIBuilder

@@ -2,16 +2,12 @@ package lib
 
 import java.io.File
 
-import com.amazonaws.auth.{AWSCredentials, BasicAWSCredentials}
-import com.gu.mediaservice.lib.config.{CommonConfig, Services}
+import com.gu.mediaservice.lib.config.CommonConfig
 import play.api.Configuration
-
 
 class CropperConfig(override val configuration: Configuration) extends CommonConfig {
 
   final override lazy val appName = "cropper"
-
-  val services = new Services(this.domainRoot, this.isProd)
 
   val imgPublishingBucket = properties("publishing.image.bucket")
 
@@ -20,11 +16,6 @@ class CropperConfig(override val configuration: Configuration) extends CommonCon
   val imgPublishingSecureHost = properties.get("publishing.image.secure.host").filterNot(_.isEmpty)
 
   val topicArn = properties("sns.topic.arn")
-
-  val rootUri = services.cropperBaseUri
-  val apiUri = services.apiBaseUri
-  val kahunaUri = services.kahunaBaseUri
-  val loginUriTemplate = services.loginUriTemplate
 
   val tempDir: File = new File(properties.getOrElse("crop.output.tmp.dir", "/tmp"))
 
