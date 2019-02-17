@@ -1,7 +1,7 @@
 package lib
 
 import com.amazonaws.services.ec2.{AmazonEC2, AmazonEC2ClientBuilder}
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import com.gu.mediaservice.lib.discovery.EC2._
 import play.api.Configuration
 
@@ -15,6 +15,8 @@ case class StoreConfig(
 class MediaApiConfig(override val configuration: Configuration) extends CommonConfig {
 
   final override lazy val appName = "media-api"
+
+  val services = new Services(this.domainRoot, this.isProd)
 
   lazy val keyStoreBucket: String = properties("auth.keystore.bucket")
 
@@ -68,6 +70,7 @@ class MediaApiConfig(override val configuration: Configuration) extends CommonCo
 
   // Note: had to make these lazy to avoid init order problems ;_;
 
+  // TODO Just references services directly
   lazy val rootUri: String = services.apiBaseUri
   lazy val kahunaUri: String = services.kahunaBaseUri
   lazy val cropperUri: String = services.cropperBaseUri

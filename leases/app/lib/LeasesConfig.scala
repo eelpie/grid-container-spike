@@ -3,7 +3,7 @@ package lib
 import java.net.URI
 
 import com.gu.mediaservice.lib.argo.model.Link
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import play.api.Configuration
 
 import scala.util.Try
@@ -11,6 +11,8 @@ import scala.util.Try
 class LeasesConfig(override val configuration: Configuration) extends CommonConfig {
 
   final override lazy val appName = "leases"
+
+  val services = new Services(this.domainRoot, this.isProd)
 
   val topicArn = properties("sns.topic.arn")
 

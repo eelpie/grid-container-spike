@@ -7,11 +7,13 @@ import lib._
 import play.api.ApplicationLoader.Context
 import play.api.Logger
 import router.Routes
+import com.gu.mediaservice.lib.config.Services
 
 class ThrallComponents(context: Context) extends GridComponents(context) {
 
-  println("!!!!!!!!!!!")
   final override lazy val config = new ThrallConfig(configuration)
+
+  val services = new Services(config.domainRoot, config.isProd)
 
   val store = new ThrallStore(config)
   val dynamoNotifications = new DynamoNotifications(config)

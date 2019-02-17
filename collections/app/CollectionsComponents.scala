@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
 import controllers.{CollectionsController, ImageCollectionsController}
 import lib.{CollectionsConfig, CollectionsMetrics, Notifications}
@@ -7,6 +8,8 @@ import store.CollectionsStore
 
 class CollectionsComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new CollectionsConfig(configuration)
+
+  val services = new Services(config.domainRoot, config.isProd)
 
   val store = new CollectionsStore(config)
   val metrics = new CollectionsMetrics(config)

@@ -2,12 +2,14 @@ package lib
 
 import java.io.File
 
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import play.api.Configuration
 
 class ImageLoaderConfig(override val configuration: Configuration) extends CommonConfig {
 
   final override lazy val appName = "image-loader"
+
+  val services = new Services(this.domainRoot, this.isProd)
 
   val topicArn: String = properties("sns.topic.arn")
 

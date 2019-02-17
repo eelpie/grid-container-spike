@@ -9,6 +9,7 @@ import com.gu.mediaservice.lib.argo.ArgoHelpers
 import com.gu.mediaservice.lib.argo.model._
 import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.aws.{NoItemFound, UpdateMessage}
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.formatting._
 import com.gu.mediaservice.model._
 import lib._
@@ -41,12 +42,12 @@ import scala.concurrent.{ExecutionContext, Future}
 // }
 
 class EditsController(auth: Authentication, store: EditsStore, notifications: Notifications, config: EditsConfig,
-                      override val controllerComponents: ControllerComponents)(implicit val ec: ExecutionContext)
+                      override val controllerComponents: ControllerComponents, services: Services)(implicit val ec: ExecutionContext)
   extends BaseController with ArgoHelpers with EditsResponse {
 
   import UsageRightsMetadataMapper.usageRightsToMetadata
 
-  val metadataBaseUri = config.services.metadataBaseUri
+  val metadataBaseUri = services.metadataBaseUri
 
   def decodeUriParam(param: String): String = decode(param, "UTF-8")
 

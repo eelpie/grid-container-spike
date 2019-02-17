@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
 import controllers.{AssetsComponents, KahunaController}
 import lib.KahunaConfig
@@ -8,34 +9,36 @@ import router.Routes
 
 class KahunaComponents(context: Context) extends GridComponents(context) with AssetsComponents {
   final override lazy val config = new KahunaConfig(configuration)
-  final override lazy val securityHeadersConfig: SecurityHeadersConfig = KahunaSecurityConfig(config, context.initialConfiguration)
+  val services = new Services(config.domainRoot, config.isProd)
+
+  final override lazy val securityHeadersConfig: SecurityHeadersConfig = KahunaSecurityConfig(config, context.initialConfiguration, services)
 
   val controller = new KahunaController(auth, config, controllerComponents)
   final override val router = new Routes(httpErrorHandler, controller, assets, management)
 }
 
 object KahunaSecurityConfig {
-  def apply(config: KahunaConfig, playConfig: Configuration): SecurityHeadersConfig = {
+  def apply(config: KahunaConfig, playConfig: Configuration, services: Services): SecurityHeadersConfig = {
     val base = SecurityHeadersConfig.fromConfiguration(playConfig)
 
-    val services = List(
-      config.services.apiBaseUri,
-      config.services.loaderBaseUri,
-      config.services.cropperBaseUri,
-      config.services.metadataBaseUri,
-      config.services.imgopsBaseUri,
-      config.services.usageBaseUri,
-      config.services.collectionsBaseUri,
-      config.services.leasesBaseUri,
-      config.services.authBaseUri,
-      config.services.guardianWitnessBaseUri
+    val serviceUrls = List(
+      services.apiBaseUri,
+      services.loaderBaseUri,
+      services.cropperBaseUri,
+      services.metadataBaseUri,
+      services.imgopsBaseUri,
+      services.usageBaseUri,
+      services.collectionsBaseUri,
+      services.leasesBaseUri,
+      services.authBaseUri,
+      services.guardianWitnessBaseUri
     )
 
-    val frameSources = s"frame-src ${config.services.authBaseUri} ${config.services.kahunaBaseUri} https://accounts.google.com"
-    val frameAncestors = s"frame-ancestors ${config.services.toolsDomains.map(domain => s"*.$domain").mkString(" ")}"
-    val connectSources = s"connect-src ${(services :+ config.imageOrigin).mkString(" ")} 'self' www.google-analytics.com"
+    val frameSources = s"frame-src ${services.authBaseUri} ${services.kahunaBaseUri} https://accounts.google.com"
+    val frameAncestors = s"frame-ancestors ${services.toolsDomains.map(domain => s"*.$domain").mkString(" ")}"
+    val connectSources = s"connect-src ${(serviceUrls :+ config.imageOrigin).mkString(" ")} 'self' www.google-analytics.com"
 
-    val imageSources = s"img-src data: blob: ${config.services.imgopsBaseUri} https://${config.fullOrigin} https://${config.thumbOrigin} ${config.cropOrigin} www.google-analytics.com 'self'"
+    val imageSources = s"img-src data: blob: ${services.imgopsBaseUri} https://${config.fullOrigin} https://${config.thumbOrigin} ${config.cropOrigin} www.google-analytics.com 'self'"
 
     base.copy(
       // covered by frame-ancestors in contentSecurityPolicy

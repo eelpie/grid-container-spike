@@ -66,7 +66,7 @@ startDockerContainers() {
 
 startPlayApps() {
     if [ "$IS_DEBUG" = true ] ; then
-        sbt -jvm-debug 5005 runAll
+        /opt/sbt-0.13.13/bin/sbt -jvm-debug 5005 runAll
     else
         sbt runAll
     fi
@@ -80,10 +80,6 @@ downloadApplicationConfig() {
 }
 
 main() {
-    checkRequirements
-    setupImgops
-    downloadApplicationConfig
-    startDockerContainers
     startPlayApps
 }
 

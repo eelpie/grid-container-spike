@@ -1,4 +1,5 @@
 import com.gu.mediaservice.lib.aws.MessageSender
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.elasticsearch.ElasticSearchConfig
 import com.gu.mediaservice.lib.elasticsearch6.ElasticSearch6Config
 import com.gu.mediaservice.lib.imaging.ImageOperations
@@ -13,6 +14,7 @@ import router.Routes
 
 class MediaApiComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new MediaApiConfig(configuration)
+  val services = new Services(config.domainRoot, config.isProd)
 
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 

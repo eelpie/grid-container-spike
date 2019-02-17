@@ -3,13 +3,15 @@ package lib
 import java.io.File
 
 import com.amazonaws.auth.{AWSCredentials, BasicAWSCredentials}
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import play.api.Configuration
 
 
 class CropperConfig(override val configuration: Configuration) extends CommonConfig {
 
   final override lazy val appName = "cropper"
+
+  val services = new Services(this.domainRoot, this.isProd)
 
   val imgPublishingBucket = properties("publishing.image.bucket")
 

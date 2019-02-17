@@ -14,7 +14,10 @@ trait CommonConfig {
   def appName: String
   def configuration: Configuration
 
+  // TODO want to drive out this Guardian native config file
   lazy val properties: Map[String, String] = Properties.fromPath(s"/etc/gu/$appName.properties")
+
+  lazy val domainRoot: String = properties("domain.root")
 
   final val awsEndpoint = "ec2.eu-west-1.amazonaws.com"
 

@@ -1,11 +1,13 @@
 package lib
 
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import play.api.Configuration
 
 class KahunaConfig(override val configuration: Configuration) extends CommonConfig {
 
   final override lazy val appName = "kahuna"
+
+  val services = new Services(this.domainRoot, this.isProd)
 
   val rootUri: String = services.kahunaBaseUri
   val mediaApiUri: String = services.apiBaseUri

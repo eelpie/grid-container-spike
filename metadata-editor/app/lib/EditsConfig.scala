@@ -1,11 +1,10 @@
 package lib
 
 import com.amazonaws.regions.{Region, RegionUtils}
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import play.api.Configuration
 
-
-class EditsConfig(override val configuration: Configuration) extends CommonConfig {
+class EditsConfig(override val configuration: Configuration, services: Services) extends CommonConfig {
 
   final override lazy val appName = "metadata-editor"
 

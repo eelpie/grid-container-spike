@@ -1,6 +1,6 @@
 package lib
 
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import play.api.Configuration
 
 import scala.concurrent.ExecutionContext
@@ -9,6 +9,8 @@ import scala.concurrent.ExecutionContext
 class CollectionsConfig(override val configuration: Configuration)(implicit ec: ExecutionContext) extends CommonConfig {
 
   override lazy val appName = "collections"
+
+  val services = new Services(this.domainRoot, this.isProd)
 
   val collectionsTable = properties("dynamo.table.collections")
   val imageCollectionsTable = properties("dynamo.table.imageCollections")
