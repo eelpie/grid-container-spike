@@ -7,6 +7,7 @@ import com.gu.mediaservice.lib.argo.ArgoHelpers
 import com.gu.mediaservice.lib.argo.model.{EntityResponse, Link, Action => ArgoAction}
 import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.aws.UpdateMessage
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.logging.GridLogger
 import com.gu.mediaservice.model.usage.Usage
 import lib._
@@ -19,9 +20,10 @@ import play.utils.UriEncoding
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class UsageApi(auth: Authentication, usageTable: UsageTable, usageGroup: UsageGroupOps, notifications: Notifications, config: UsageConfig, usageRecorder: UsageRecorder, liveContentApi: LiveContentApi,
-  override val controllerComponents: ControllerComponents, playBodyParsers: PlayBodyParsers)(implicit val ec: ExecutionContext)
-  extends BaseController with ArgoHelpers {
+class UsageApi(auth: Authentication, usageTable: UsageTable, usageGroup: UsageGroupOps, notifications: Notifications,
+               config: UsageConfig, usageRecorder: UsageRecorder, liveContentApi: LiveContentApi,
+               override val controllerComponents: ControllerComponents, playBodyParsers: PlayBodyParsers,
+               services: Services)(implicit val ec: ExecutionContext) extends BaseController with ArgoHelpers {
 
   private def wrapUsage(usage: Usage): EntityResponse[Usage] = {
     EntityResponse(
@@ -32,24 +34,29 @@ class UsageApi(auth: Authentication, usageTable: UsageTable, usageGroup: UsageGr
 
   private def usageUri(usageId: String): Option[URI] = {
     val encodedUsageId = UriEncoding.encodePathSegment(usageId, "UTF-8")
-    Try { URI.create(s"${config.usageUri}/usages/$encodedUsageId") }.toOption
+    Try {
+      URI.create(s"${services.usageBaseUri}/usages/$encodedUsageId")
+    }.toOption
   }
 
   val indexResponse = {
     val indexData = Map("description" -> "This is the Usage Recording service")
     val indexLinks = List(
-      Link("usages-by-media", s"${config.usageUri}/usages/media/{id}"),
-      Link("usages-by-id", s"${config.usageUri}/usages/{id}")
+      Link("usages-by-media", s"${services.usageBaseUri}/usages/media/{id}"),
+      Link("usages-by-id", s"${services.usageBaseUri}/usages/{id}")
     )
 
-    val printPostUri = URI.create(s"${config.usageUri}/usages/print")
+    val printPostUri = URI.create(s"${services.usageBaseUri}/usages/print")
     val actions = List(
       ArgoAction("print-usage", printPostUri, "POST")
     )
 
     respond(indexData, indexLinks, actions)
   }
-  def index = auth { indexResponse }
+
+  def index = auth {
+    indexResponse
+  }
 
   def forUsage(usageId: String) = auth.async {
     GridLogger.info(s"Request for single usage $usageId")
@@ -64,8 +71,8 @@ class UsageApi(auth: Authentication, usageTable: UsageTable, usageGroup: UsageGr
 
         val uri = usageUri(usage.id)
         val links = List(
-          Link("media", s"${config.services.apiBaseUri}/images/$mediaId"),
-          Link("media-usage", s"${config.services.usageBaseUri}/usages/media/$mediaId")
+          Link("media", s"${services.apiBaseUri}/images/$mediaId"),
+          Link("media-usage", s"${services.usageBaseUri}/usages/media/$mediaId")
         )
 
         respond[Usage](data = usage, uri = uri, links = links)
@@ -113,9 +120,11 @@ class UsageApi(auth: Authentication, usageTable: UsageTable, usageGroup: UsageGr
       usages match {
         case Nil => respondNotFound("No usages found.")
         case usage :: _ =>
-          val uri = Try { URI.create(s"${config.services.usageBaseUri}/usages/media/$mediaId") }.toOption
+          val uri = Try {
+            URI.create(s"${services.usageBaseUri}/usages/media/$mediaId")
+          }.toOption
           val links = List(
-            Link("media", s"${config.services.apiBaseUri}/images/$mediaId")
+            Link("media", s"${services.apiBaseUri}/images/$mediaId")
           )
 
           respondCollection[EntityResponse[Usage]](
@@ -134,19 +143,19 @@ class UsageApi(auth: Authentication, usageTable: UsageTable, usageGroup: UsageGr
   val setPrintRequestBodyParser: BodyParser[JsValue] = playBodyParsers.json(maxLength = maxPrintRequestLength)
 
   def setPrintUsages = auth(setPrintRequestBodyParser) { request => {
-      val printUsageRequestResult = request.body.validate[PrintUsageRequest]
-      printUsageRequestResult.fold(
-        e => {
-          respondError(BadRequest, "print-usage-request-parse-failed", JsError.toJson(e).toString)
-        },
-        printUsageRequest => {
-          val usageGroups = usageGroup.build(printUsageRequest.printUsageRecords)
-          usageGroups.foreach(usageRecorder.usageSubject.onNext)
+    val printUsageRequestResult = request.body.validate[PrintUsageRequest]
+    printUsageRequestResult.fold(
+      e => {
+        respondError(BadRequest, "print-usage-request-parse-failed", JsError.toJson(e).toString)
+      },
+      printUsageRequest => {
+        val usageGroups = usageGroup.build(printUsageRequest.printUsageRecords)
+        usageGroups.foreach(usageRecorder.usageSubject.onNext)
 
-          Accepted
-        }
-      )
-    }
+        Accepted
+      }
+    )
+  }
   }
 
   def setSyndicationUsages() = auth(parse.json) { req => {
@@ -164,7 +173,8 @@ class UsageApi(auth: Authentication, usageTable: UsageTable, usageGroup: UsageGr
         Accepted
       }
     )
-  }}
+  }
+  }
 
   def setFrontUsages() = auth(parse.json) { req => {
     val request = (req.body \ "data").validate[FrontUsageRequest]
@@ -181,12 +191,13 @@ class UsageApi(auth: Authentication, usageTable: UsageTable, usageGroup: UsageGr
         Accepted
       }
     )
-  }}
+  }
+  }
 
   def deleteUsages(mediaId: String) = auth.async {
     usageTable.queryByImageId(mediaId).map(usages => {
       usages.foreach(usageTable.deleteRecord)
-    }).recover{
+    }).recover {
       case error: Exception =>
         Logger.error("UsageApi returned an error.", error)
         respondError(InternalServerError, "image-usage-delete-failed", error.getMessage)
@@ -196,4 +207,5 @@ class UsageApi(auth: Authentication, usageTable: UsageTable, usageGroup: UsageGr
     notifications.publish(Json.obj("id" -> mediaId), "delete-usages", updateMessage)
     Future.successful(Ok)
   }
+
 }

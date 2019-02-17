@@ -4,8 +4,9 @@ import play.api.Logger
 import play.api.libs.json._
 import com.gu.contentapi.client.model.v1.{Content, Element, ElementType}
 import com.gu.contentatom.thrift.{Atom, AtomData}
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.model.usage.{DigitalUsageMetadata, PublishedUsageStatus, UsageStatus}
-import lib.{UsageConfig, LiveContentApi, MD5, UsageMetadataBuilder}
+import lib.{LiveContentApi, MD5, UsageConfig, UsageMetadataBuilder}
 import org.joda.time.DateTime
 
 case class UsageGroup(
@@ -15,7 +16,8 @@ case class UsageGroup(
   lastModified: DateTime,
   isReindex: Boolean = false
 )
-class UsageGroupOps(config: UsageConfig, mediaUsageOps: MediaUsageOps, liveContentApi: LiveContentApi, mediaWrapperOps: MediaWrapperOps) {
+class UsageGroupOps(config: UsageConfig, mediaUsageOps: MediaUsageOps, liveContentApi: LiveContentApi,
+                    mediaWrapperOps: MediaWrapperOps, services: Services) {
 
   def buildId(contentWrapper: ContentWrapper) = contentWrapper.id
   def buildId(printUsage: PrintUsageRecord) = s"print/${MD5.hash(List(
@@ -173,7 +175,7 @@ class UsageGroupOps(config: UsageConfig, mediaUsageOps: MediaUsageOps, liveConte
     try {
       val posterImage = atom.data.asInstanceOf[AtomData.Media].media.posterImage
       posterImage match {
-        case Some(image) => Some(image.mediaId.replace(s"${config.apiUri}/images/", ""))
+        case Some(image) => Some(image.mediaId.replace(s"${services.apiBaseUri}/images/", ""))
         case _ => None
       }
     } catch {

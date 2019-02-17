@@ -10,7 +10,6 @@ import play.api.Configuration
 
 import scala.io.Source._
 
-
 trait CommonConfig {
   def appName: String
   def configuration: Configuration
@@ -46,10 +45,6 @@ trait CommonConfig {
 
   final val thrallKinesisStream = s"$stackName-thrall-$stage"
 
-  // Note: had to make these lazy to avoid init order problems ;_;
-  lazy val domainRoot: String = properties("domain.root")
-  lazy val services = new Services(domainRoot, isProd)
-
   final def apply(key: String): String =
     string(key)
 
@@ -68,4 +63,5 @@ trait CommonConfig {
     val file = new File("/etc/gu/stage")
     if (file.exists) Some(fromFile(file).mkString.trim) else None
   }
+
 }

@@ -9,6 +9,8 @@ import play.api.Logger
 import router.Routes
 
 class ThrallComponents(context: Context) extends GridComponents(context) {
+
+  println("!!!!!!!!!!!")
   final override lazy val config = new ThrallConfig(configuration)
 
   val store = new ThrallStore(config)

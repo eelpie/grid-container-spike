@@ -1,27 +1,18 @@
 package lib
 
-import java.net.URI
-
 import com.amazonaws.regions.{Region, RegionUtils}
 import com.amazonaws.services.identitymanagement._
 import com.gu.mediaservice.lib.config.CommonConfig
-import play.api.{Configuration, Logger}
 import com.gu.mediaservice.lib.net.URI.ensureSecure
+import play.api.{Configuration, Logger}
 
 import scala.util.Try
-
 
 case class KinesisReaderConfig(streamName: String, arn: String, appName: String)
 
 class UsageConfig(override val configuration: Configuration) extends CommonConfig {
 
   final override lazy val appName = "usage"
-
-  lazy val rootUri: String = services.metadataBaseUri
-  lazy val kahunaUri: String = services.kahunaBaseUri
-  lazy val usageUri: String = services.usageBaseUri
-  lazy val apiUri: String = services.apiBaseUri
-  lazy val loginUriTemplate: String = services.loginUriTemplate
 
   val defaultPageSize = 100
   val defaultMaxRetries = 6
@@ -49,11 +40,19 @@ class UsageConfig(override val configuration: Configuration) extends CommonConfi
   val dynamoRegion: Region = RegionUtils.getRegion(properties("aws.region"))
   val awsRegionName = properties("aws.region")
 
-  val crierLiveKinesisStream = Try { properties("crier.live.name") }
-  val crierPreviewKinesisStream = Try { properties("crier.preview.name") }
+  val crierLiveKinesisStream = Try {
+    properties("crier.live.name")
+  }
+  val crierPreviewKinesisStream = Try {
+    properties("crier.preview.name")
+  }
 
-  val crierLiveArn = Try { properties("crier.live.arn") }
-  val crierPreviewArn = Try { properties("crier.preview.arn") }
+  val crierLiveArn = Try {
+    properties("crier.live.arn")
+  }
+  val crierPreviewArn = Try {
+    properties("crier.preview.arn")
+  }
 
   lazy val liveKinesisReaderConfig: Try[KinesisReaderConfig] = for {
     liveStream <- crierLiveKinesisStream
@@ -71,7 +70,7 @@ class UsageConfig(override val configuration: Configuration) extends CommonConfi
     try {
       iamClient.getUser.getUser.getUserName
     } catch {
-      case e:com.amazonaws.AmazonServiceException=>
+      case e: com.amazonaws.AmazonServiceException =>
         Logger.warn("Unable to determine current IAM user, probably because you're using temp credentials.  Usage may not be able to determine the live/preview app names")
         "tempcredentials"
     }
@@ -93,4 +92,5 @@ class UsageConfig(override val configuration: Configuration) extends CommonConfi
       Logger.error(s"App name is invalid: $name")
       sys.exit(1)
   }
+
 }

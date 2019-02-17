@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
 import controllers.UsageApi
 import lib._
@@ -11,11 +12,16 @@ class UsageComponents(context: Context) extends GridComponents(context) {
 
   final override lazy val config = new UsageConfig(configuration)
 
+  // TODO try to remove lazy vals where possible
+  // Note: had to make these lazy to avoid init order problems
+  lazy val domainRoot: String = config.properties("domain.root")
+  lazy val services = new Services(domainRoot, config.isProd)
+
   val usageMetadataBuilder = new UsageMetadataBuilder(config)
   val mediaWrapper = new MediaWrapperOps(usageMetadataBuilder)
   val mediaUsage = new MediaUsageOps(usageMetadataBuilder)
   val liveContentApi = new LiveContentApi(config)
-  val usageGroup = new UsageGroupOps(config, mediaUsage, liveContentApi, mediaWrapper)
+  val usageGroup = new UsageGroupOps(config, mediaUsage, liveContentApi, mediaWrapper, services)
   val usageTable = new UsageTable(config, mediaUsage)
   val usageMetrics = new UsageMetrics(config)
   val usageNotifier = new UsageNotifier(config, usageTable)
@@ -34,7 +40,8 @@ class UsageComponents(context: Context) extends GridComponents(context) {
     Future.successful(())
   })
 
-  val controller = new UsageApi(auth, usageTable, usageGroup, notifications, config, usageRecorder, liveContentApi, controllerComponents, playBodyParsers)
+  val controller = new UsageApi(auth, usageTable, usageGroup, notifications, config, usageRecorder, liveContentApi,
+    controllerComponents, playBodyParsers, services)
 
   override lazy val router = new Routes(httpErrorHandler, controller, management)
 }

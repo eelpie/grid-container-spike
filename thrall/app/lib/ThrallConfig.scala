@@ -5,9 +5,10 @@ import com.gu.mediaservice.lib.config.CommonConfig
 import com.gu.mediaservice.lib.discovery.EC2
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 
 class ThrallConfig(override val configuration: Configuration) extends CommonConfig {
+  Logger.info("Configurating thrall")
   private lazy val ec2Client = withAWSCredentials(AmazonEC2ClientBuilder.standard()).build()
 
   final override lazy val appName = "thrall"

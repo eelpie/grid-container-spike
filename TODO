@@ -13,5 +13,8 @@ sbt thrall/run
 
 domain.root not found because CommonConfig is looking for Guardian native properties files.
 
+thrall is not interested in service urls so dropped in from common config;
+let services who are interested mix in directly.
+
 Want CommonConfig to respect Play config or the Play app to be able to bypass CommonConfig.
 ThrallConfig has a reference to Play config should do as much as it can from this rather than CommonConfig.

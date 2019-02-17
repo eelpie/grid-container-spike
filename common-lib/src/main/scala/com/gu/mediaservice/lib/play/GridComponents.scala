@@ -1,7 +1,7 @@
 package com.gu.mediaservice.lib.play
 
 import com.gu.mediaservice.lib.auth.Authentication
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import com.gu.mediaservice.lib.management.Management
 import play.api.ApplicationLoader.Context
 import play.api.BuiltInComponentsFromContext
@@ -18,6 +18,7 @@ abstract class GridComponents(context: Context) extends BuiltInComponentsFromCon
   with AhcWSComponents with HttpFiltersComponents with CORSComponents with GzipFilterComponents {
 
   def config: CommonConfig
+  def services: Services
 
   implicit val ec: ExecutionContext = executionContext
 
@@ -26,9 +27,9 @@ abstract class GridComponents(context: Context) extends BuiltInComponentsFromCon
   }
 
   final override lazy val corsConfig: CORSConfig = CORSConfig.fromConfiguration(context.initialConfiguration).copy(
-    allowedOrigins = Origins.Matching(Set(config.services.kahunaBaseUri) ++ config.services.corsAllowedTools)
+    allowedOrigins = Origins.Matching(Set(services.kahunaBaseUri) ++ services.corsAllowedTools)
   )
 
   val management = new Management(controllerComponents)
-  val auth = new Authentication(config, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
+  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
 }

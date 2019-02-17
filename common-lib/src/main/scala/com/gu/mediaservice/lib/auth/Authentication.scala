@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.gu.mediaservice.lib.argo.ArgoHelpers
 import com.gu.mediaservice.lib.argo.model.Link
 import com.gu.mediaservice.lib.auth.Authentication.{AuthenticatedService, PandaUser}
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import com.gu.mediaservice.lib.logging.GridLogger
 import com.gu.pandomainauth.PanDomainAuthSettingsRefresher
 import com.gu.pandomainauth.action.{AuthActions, UserRequest}
@@ -15,7 +15,9 @@ import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class Authentication(config: CommonConfig, actorSystem: ActorSystem,
+class Authentication(config: CommonConfig,
+                     services: Services,
+                     actorSystem: ActorSystem,
                      override val parser: BodyParser[AnyContent],
                      override val wsClient: WSClient,
                      override val controllerComponents: ControllerComponents,
@@ -26,7 +28,7 @@ class Authentication(config: CommonConfig, actorSystem: ActorSystem,
   implicit val ec: ExecutionContext = executionContext
 
   val loginLinks = List(
-    Link("login", config.services.loginUriTemplate)
+    Link("login", services.loginUriTemplate)
   )
 
   // API key errors
@@ -40,7 +42,7 @@ class Authentication(config: CommonConfig, actorSystem: ActorSystem,
 
   override lazy val panDomainSettings = buildPandaSettings()
 
-  final override def authCallbackUrl: String = s"${config.services.authBaseUri}/oauthCallback"
+  final override def authCallbackUrl: String = s"${services.authBaseUri}/oauthCallback"
 
   override def invokeBlock[A](request: Request[A], block: Authentication.Request[A] => Future[Result]): Future[Result] = {
     // Try to auth by API key, and failing that, with Panda
@@ -49,7 +51,7 @@ class Authentication(config: CommonConfig, actorSystem: ActorSystem,
         keyStore.lookupIdentity(key) match {
           case Some(apiKey) =>
             GridLogger.info(s"Using api key with name ${apiKey.name} and tier ${apiKey.tier}", apiKey)
-            if (ApiKey.hasAccess(apiKey, request, config.services))
+            if (ApiKey.hasAccess(apiKey, request, services))
               block(new AuthenticatedRequest(AuthenticatedService(apiKey), request))
             else
               Future.successful(ApiKey.unauthorizedResult)
@@ -68,7 +70,7 @@ class Authentication(config: CommonConfig, actorSystem: ActorSystem,
 
   private def buildPandaSettings() = {
     new PanDomainAuthSettingsRefresher(
-      domain = config.services.domainRoot,
+      domain = services.domainRoot,
       system = "media-service",
       actorSystem = actorSystem,
       awsCredentialsProvider = config.awsCredentials
