@@ -42,7 +42,7 @@ class Authentication(config: CommonConfig,
 
   keyStore.scheduleUpdates(actorSystem.scheduler)
 
-  override lazy val panDomainSettings = buildPandaSettings()
+  override lazy val panDomainSettings: PanDomainAuthSettingsRefresher = buildPandaSettings()
 
   final override def authCallbackUrl: String = s"${services.authBaseUri}/oauthCallback"
 
@@ -66,7 +66,7 @@ class Authentication(config: CommonConfig,
     }
   }
 
-  private val userValidationEmailDomain = config.stringOpt("panda.userDomain").getOrElse("guardian.co.uk")
+  private val userValidationEmailDomain = config.pandaUserDomain
 
   final override def validateUser(authedUser: AuthenticatedUser): Boolean = {
     Authentication.validateUser(authedUser, userValidationEmailDomain, multifactorChecker)
@@ -75,9 +75,9 @@ class Authentication(config: CommonConfig,
   private def buildPandaSettings() = {
     new PanDomainAuthSettingsRefresher(
       domain = services.domainRoot,
-      system = config.stringOpt("panda.system").getOrElse("media-service"),
-      bucketName = config.stringOpt("panda.bucketName").getOrElse("pan-domain-auth-settings"),
-      settingsFileKey = config.stringOpt("panda.settingsFileKey").getOrElse(s"${services.domainRoot}.settings"),
+      system = config.pandaSystem,
+      bucketName = config.pandaSettingsBucket,
+      settingsFileKey = "panda.settings",
       s3Client = config.withAWSCredentials(AmazonS3ClientBuilder.standard()).build()
     )
   }

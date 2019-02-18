@@ -15,6 +15,10 @@ trait CommonConfig {
 
   val domainRoot: String = configuration.get[String]("domain.root")
 
+  val pandaSystem: String = configuration.get[String]("panda.system")
+  val pandaSettingsBucket: String = configuration.get[String]("panda.bucket")
+  val pandaUserDomain: String = configuration.get[String]("panda.userDomain")
+
   // TODO want to drive out this Guardian native config file
   lazy val properties: Map[String, String] = Properties.fromPath(s"/etc/gu/$appName.properties")
 
