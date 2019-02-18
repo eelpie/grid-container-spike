@@ -29,6 +29,8 @@ class LeasesConfig(override val configuration: Configuration) extends CommonConf
   def leaseUri(leaseId: String): Option[URI] = Try { URI.create(s"$leasesUri/$leaseId") }.toOption
   def leasesMediaUri(mediaId: String) = Try { URI.create(s"$leasesUri/media/$mediaId") }.toOption
 
+  // TODO this is a method not a config element
   private def mediaApiUri(id: String) = s"${services.apiBaseUri}/images/$id"
+
   def mediaApiLink(id: String) = Link("media", mediaApiUri(id))
 }
