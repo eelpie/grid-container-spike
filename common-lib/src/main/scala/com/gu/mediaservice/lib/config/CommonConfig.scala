@@ -18,7 +18,6 @@ trait CommonConfig {
   // TODO want to drive out this Guardian native config file
   lazy val properties: Map[String, String] = Properties.fromPath(s"/etc/gu/$appName.properties")
 
-
   final val awsEndpoint = "ec2.eu-west-1.amazonaws.com"
 
   final val elasticsearchStack = "media-service"
@@ -30,8 +29,8 @@ trait CommonConfig {
 
   final val sessionId = UUID.randomUUID().toString
 
-  val awsAccessKey = "TODO"
-  val awsSecretKey = "TODO"
+  val awsAccessKey = configuration.get[String]("ec2.accessKey")
+  val awsSecretKey =  configuration.get[String]("ec2.secretKey")
   lazy val awsCredentials = new AWSStaticCredentialsProvider(new BasicAWSCredentials(awsAccessKey, awsSecretKey))
 
   lazy val awsRegion = properties.getOrElse("aws.region", "eu-west-1")
