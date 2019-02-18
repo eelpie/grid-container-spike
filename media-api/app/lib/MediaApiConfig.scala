@@ -1,7 +1,7 @@
 package lib
 
 import com.amazonaws.services.ec2.{AmazonEC2, AmazonEC2ClientBuilder}
-import com.gu.mediaservice.lib.config.{CommonConfig, Services}
+import com.gu.mediaservice.lib.config.CommonConfig
 import com.gu.mediaservice.lib.discovery.EC2._
 import play.api.Configuration
 
@@ -15,8 +15,6 @@ case class StoreConfig(
 class MediaApiConfig(override val configuration: Configuration) extends CommonConfig {
 
   final override lazy val appName = "media-api"
-
-  val services = new Services(this)
 
   lazy val keyStoreBucket: String = properties("auth.keystore.bucket")
 
@@ -67,21 +65,6 @@ class MediaApiConfig(override val configuration: Configuration) extends CommonCo
   lazy val cloudFrontKeyPairId: Option[String]         = properties.get("cloudfront.keypair.id")
 
   lazy val topicArn: String = properties("sns.topic.arn")
-
-  // Note: had to make these lazy to avoid init order problems ;_;
-
-  // TODO Just references services directly
-  lazy val rootUri: String = services.apiBaseUri
-  lazy val kahunaUri: String = services.kahunaBaseUri
-  lazy val cropperUri: String = services.cropperBaseUri
-  lazy val loaderUri: String = services.loaderBaseUri
-  lazy val metadataUri: String = services.metadataBaseUri
-  lazy val imgopsUri: String = services.imgopsBaseUri
-  lazy val usageUri: String = services.usageBaseUri
-  lazy val leasesUri: String = services.leasesBaseUri
-  lazy val authUri: String = services.authBaseUri
-  lazy val loginUriTemplate: String = services.loginUriTemplate
-  lazy val collectionsUri: String = services.collectionsBaseUri
 
   lazy val requiredMetadata = List("credit", "description", "usageRights")
 

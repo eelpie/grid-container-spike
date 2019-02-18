@@ -13,7 +13,7 @@ class KahunaComponents(context: Context) extends GridComponents(context) with As
 
   final override lazy val securityHeadersConfig: SecurityHeadersConfig = KahunaSecurityConfig(config, context.initialConfiguration, services)
 
-  val controller = new KahunaController(auth, config, controllerComponents)
+  val controller = new KahunaController(auth, config, controllerComponents, services)
   final override val router = new Routes(httpErrorHandler, controller, assets, management)
 }
 
