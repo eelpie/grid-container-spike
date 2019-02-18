@@ -21,12 +21,12 @@ class EditsApi(auth: Authentication, config: EditsConfig,
   val indexResponse = {
     val indexData = Map("description" -> "This is the Metadata Editor Service")
     val indexLinks = List(
-      Link("edits",             s"${services.apiBaseUri}/metadata/{id}"),
-      Link("archived",          s"${services.apiBaseUri}/metadata/{id}/archived"),
-      Link("labels",            s"${services.apiBaseUri}/metadata/{id}/labels"),
-      Link("usageRights",       s"${services.apiBaseUri}/metadata/{id}/usage-rights"),
-      Link("metadata",          s"${services.apiBaseUri}/metadata/{id}/metadata"),
-      Link("usage-rights-list", s"${services.apiBaseUri}/usage-rights/categories")
+      Link("edits",             s"${services.metadataBaseUri}/metadata/{id}"),
+      Link("archived",          s"${services.metadataBaseUri}/metadata/{id}/archived"),
+      Link("labels",            s"${services.metadataBaseUri}/metadata/{id}/labels"),
+      Link("usageRights",       s"${services.metadataBaseUri}/metadata/{id}/usage-rights"),
+      Link("metadata",          s"${services.metadataBaseUri}/metadata/{id}/metadata"),
+      Link("usage-rights-list", s"${services.metadataBaseUri}/usage-rights/categories")
     )
     respond(indexData, indexLinks)
   }
