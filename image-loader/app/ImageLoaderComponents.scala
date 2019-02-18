@@ -20,7 +20,7 @@ class ImageLoaderComponents(context: Context) extends GridComponents(context) {
   val optimisedPngOps = new OptimisedPngOps(store, config)
   val imageUploadOps = new ImageUploadOps(store, config, imageOperations, optimisedPngOps)
 
-  val controller = new ImageLoaderController(auth, downloader, store, notifications, config, imageUploadOps, controllerComponents, wsClient)
+  val controller = new ImageLoaderController(auth, downloader, store, notifications, config, imageUploadOps, controllerComponents, wsClient, services)
 
   override lazy val router = new Routes(httpErrorHandler, controller, management)
 }

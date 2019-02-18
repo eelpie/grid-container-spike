@@ -6,6 +6,7 @@ import com.gu.mediaservice.lib.argo.ArgoHelpers
 import com.gu.mediaservice.lib.argo.model.Link
 import com.gu.mediaservice.lib.auth.Authentication.PandaUser
 import com.gu.mediaservice.lib.auth.{Authentication, Permissions, PermissionsHandler}
+import com.gu.mediaservice.lib.config.Services
 import com.gu.pandomainauth.service.GoogleAuthException
 import play.api.Logger
 import play.api.libs.json.Json
@@ -15,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class AuthController(auth: Authentication, val config: AuthConfig,
-                     override val controllerComponents: ControllerComponents)(implicit ec: ExecutionContext)
+                     override val controllerComponents: ControllerComponents, services: Services)(implicit ec: ExecutionContext)
   extends BaseController
   with ArgoHelpers
   with PermissionsHandler {
@@ -23,10 +24,10 @@ class AuthController(auth: Authentication, val config: AuthConfig,
   val indexResponse = {
     val indexData = Map("description" -> "This is the Auth API")
     val indexLinks = List(
-      Link("root",          config.mediaApiUri),
-      Link("login",         config.services.loginUriTemplate),
-      Link("ui:logout",     s"${config.rootUri}/logout"),
-      Link("session",       s"${config.rootUri}/session")
+      Link("root",          services.apiBaseUri),
+      Link("login",         services.loginUriTemplate),
+      Link("ui:logout",     s"${services.authBaseUri}/logout"),
+      Link("session",       s"${services.authBaseUri}/session")
     )
     respond(indexData, indexLinks)
   }

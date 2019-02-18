@@ -15,7 +15,7 @@ class CollectionsComponents(context: Context) extends GridComponents(context) {
   val metrics = new CollectionsMetrics(config)
   val notifications = new Notifications(config)
 
-  val collections = new CollectionsController(auth, config, store, controllerComponents)
+  val collections = new CollectionsController(auth, config, store, controllerComponents, services)
   val imageCollections = new ImageCollectionsController(auth, config, notifications, controllerComponents)
 
   override val router = new Routes(httpErrorHandler, collections, imageCollections, management)

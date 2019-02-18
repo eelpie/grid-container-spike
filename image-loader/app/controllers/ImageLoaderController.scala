@@ -8,6 +8,7 @@ import com.gu.mediaservice.lib.argo.model.Link
 import com.gu.mediaservice.lib.auth.Authentication.Principal
 import com.gu.mediaservice.lib.auth._
 import com.gu.mediaservice.lib.aws.UpdateMessage
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.logging.GridLogger
 import com.gu.mediaservice.model.UploadInfo
 import lib._
@@ -25,14 +26,14 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Try}
 
 class ImageLoaderController(auth: Authentication, downloader: Downloader, store: ImageLoaderStore, notifications: Notifications, config: ImageLoaderConfig, imageUploadOps: ImageUploadOps,
-                            override val controllerComponents: ControllerComponents, wSClient: WSClient)(implicit val ec: ExecutionContext)
+                            override val controllerComponents: ControllerComponents, wSClient: WSClient, services: Services)(implicit val ec: ExecutionContext)
   extends BaseController with ArgoHelpers {
 
   val indexResponse: Result = {
     val indexData = Map("description" -> "This is the Loader Service")
     val indexLinks = List(
-      Link("load",   s"${config.rootUri}/images{?uploadedBy,identifiers,uploadTime,filename}"),
-      Link("import", s"${config.rootUri}/imports{?uri,uploadedBy,identifiers,uploadTime,filename}")
+      Link("load",   s"${services.loaderBaseUri}/images{?uploadedBy,identifiers,uploadTime,filename}"),
+      Link("import", s"${services.loaderBaseUri}/imports{?uri,uploadedBy,identifiers,uploadTime,filename}")
     )
     respond(indexData, indexLinks)
   }
@@ -145,7 +146,7 @@ class ImageLoaderController(auth: Authentication, downloader: Downloader, store:
       notifications.publish(Json.toJson(image), "image", updateMessage)
 
       // TODO: centralise where all these URLs are constructed
-      Accepted(Json.obj("uri" -> s"${config.apiUri}/images/${uploadRequest.id}")).as(ArgoMediaType)
+      Accepted(Json.obj("uri" -> s"${services.apiBaseUri}/images/${uploadRequest.id}")).as(ArgoMediaType)
     }
 
     result recover {

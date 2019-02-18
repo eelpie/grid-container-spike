@@ -10,7 +10,7 @@ class AuthComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new AuthConfig(configuration)
   val services = new Services(config)
 
-  val controller = new AuthController(auth, config, controllerComponents)
+  val controller = new AuthController(auth, config, controllerComponents, services)
   val permissionsAwareManagement = new ManagementWithPermissions(controllerComponents, controller)
 
   override val router = new Routes(httpErrorHandler, controller, permissionsAwareManagement)

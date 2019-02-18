@@ -7,6 +7,8 @@ import com.gu.mediaservice.lib.argo.model.{EmbeddedEntity, Link}
 import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.auth.Authentication.getEmail
 import com.gu.mediaservice.lib.collections.CollectionsManager
+import com.gu.mediaservice.lib.config.Services
+import com.gu.mediaservice.lib.net.{URI => UriOps}
 import com.gu.mediaservice.model.{ActionData, Collection}
 import lib.CollectionsConfig
 import model.Node
@@ -15,7 +17,6 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc.{BaseController, ControllerComponents}
 import store.{CollectionsStore, CollectionsStoreError}
-import com.gu.mediaservice.lib.net.{ URI => UriOps }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -30,17 +31,17 @@ object AppIndex {
 }
 
 class CollectionsController(authenticated: Authentication, config: CollectionsConfig, store: CollectionsStore,
-                            val controllerComponents: ControllerComponents) extends BaseController with ArgoHelpers {
+                            val controllerComponents: ControllerComponents, services: Services) extends BaseController with ArgoHelpers {
 
   import CollectionsManager.{getCssColour, isValidPathBit, pathToUri, uriToPath}
   // Stupid name clash between Argo and Play
   import com.gu.mediaservice.lib.argo.model.{Action => ArgoAction}
 
   def uri(u: String) = URI.create(u)
-  val collectionUri = uri(s"${config.rootUri}/collections")
+  val collectionUri = uri(s"${services.collectionsBaseUri}/collections")
   def collectionUri(p: List[String] = Nil) = {
     val path = if(p.nonEmpty) s"/${pathToUri(p)}" else ""
-    uri(s"${config.rootUri}/collections$path")
+    uri(s"${services.collectionsBaseUri}/collections$path")
   }
 
   val appIndex = AppIndex("media-collections", "The one stop shop for collections")
