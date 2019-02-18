@@ -3,8 +3,7 @@ package com.gu.mediaservice.lib.config
 import java.io.File
 import java.util.UUID
 
-import com.amazonaws.auth.profile.ProfileCredentialsProvider
-import com.amazonaws.auth.{AWSCredentialsProviderChain, InstanceProfileCredentialsProvider}
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder
 import play.api.Configuration
 
@@ -31,10 +30,9 @@ trait CommonConfig {
 
   final val sessionId = UUID.randomUUID().toString
 
-  lazy val awsCredentials = new AWSCredentialsProviderChain(
-    new ProfileCredentialsProvider("media-service"),
-    InstanceProfileCredentialsProvider.getInstance()
-  )
+  val awsAccessKey = "TODO"
+  val awsSecretKey = "TODO"
+  lazy val awsCredentials = new AWSStaticCredentialsProvider(new BasicAWSCredentials(awsAccessKey, awsSecretKey))
 
   lazy val awsRegion = properties.getOrElse("aws.region", "eu-west-1")
 
