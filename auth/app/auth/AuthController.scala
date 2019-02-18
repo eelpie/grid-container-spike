@@ -7,10 +7,10 @@ import com.gu.mediaservice.lib.argo.model.Link
 import com.gu.mediaservice.lib.auth.Authentication.PandaUser
 import com.gu.mediaservice.lib.auth.{Authentication, Permissions, PermissionsHandler}
 import com.gu.mediaservice.lib.config.Services
-import com.gu.pandomainauth.service.GoogleAuthException
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents}
+import com.gu.pandomainauth.service.OAuthException
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -82,9 +82,9 @@ class AuthController(auth: Authentication, val config: AuthConfig,
     // We use the `Try` here as the `GoogleAuthException` are thrown before we
     // get to the asynchronicity of the `Future` it returns.
     // We then have to flatten the Future[Future[T]]. Fiddly...
-    Future.fromTry(Try(auth.processGoogleCallback)).flatten.recover {
+    Future.fromTry(Try(auth.processOAuthCallback())).flatten.recover {
       // This is when session session args are missing
-      case e: GoogleAuthException => respondError(BadRequest, "google-auth-exception", e.getMessage, auth.loginLinks)
+      case e: OAuthException => respondError(BadRequest, "google-auth-exception", e.getMessage, auth.loginLinks)
 
       // Class `missing anti forgery token` as a 4XX
       // see https://github.com/guardian/pan-domain-authentication/blob/master/pan-domain-auth-play_2-6/src/main/scala/com/gu/pandomainauth/service/GoogleAuth.scala#L63
@@ -98,4 +98,5 @@ class AuthController(auth: Authentication, val config: AuthConfig,
   def logout = Action { implicit request =>
     auth.processLogout
   }
+
 }
