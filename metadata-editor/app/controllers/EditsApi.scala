@@ -3,6 +3,7 @@ package controllers
 import com.gu.mediaservice.lib.argo.ArgoHelpers
 import com.gu.mediaservice.lib.argo.model.Link
 import com.gu.mediaservice.lib.auth.Authentication
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.model._
 import lib.EditsConfig
 import model.UsageRightsProperty
@@ -12,7 +13,7 @@ import play.api.mvc.{BaseController, ControllerComponents}
 import scala.concurrent.ExecutionContext
 
 class EditsApi(auth: Authentication, config: EditsConfig,
-               override val controllerComponents: ControllerComponents)(implicit val ec: ExecutionContext)
+               override val controllerComponents: ControllerComponents, services: Services)(implicit val ec: ExecutionContext)
   extends BaseController with ArgoHelpers {
 
 
@@ -20,12 +21,12 @@ class EditsApi(auth: Authentication, config: EditsConfig,
   val indexResponse = {
     val indexData = Map("description" -> "This is the Metadata Editor Service")
     val indexLinks = List(
-      Link("edits",             s"${config.rootUri}/metadata/{id}"),
-      Link("archived",          s"${config.rootUri}/metadata/{id}/archived"),
-      Link("labels",            s"${config.rootUri}/metadata/{id}/labels"),
-      Link("usageRights",       s"${config.rootUri}/metadata/{id}/usage-rights"),
-      Link("metadata",          s"${config.rootUri}/metadata/{id}/metadata"),
-      Link("usage-rights-list", s"${config.rootUri}/usage-rights/categories")
+      Link("edits",             s"${services.apiBaseUri}/metadata/{id}"),
+      Link("archived",          s"${services.apiBaseUri}/metadata/{id}/archived"),
+      Link("labels",            s"${services.apiBaseUri}/metadata/{id}/labels"),
+      Link("usageRights",       s"${services.apiBaseUri}/metadata/{id}/usage-rights"),
+      Link("metadata",          s"${services.apiBaseUri}/metadata/{id}/metadata"),
+      Link("usage-rights-list", s"${services.apiBaseUri}/usage-rights/categories")
     )
     respond(indexData, indexLinks)
   }

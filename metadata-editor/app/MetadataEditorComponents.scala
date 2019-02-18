@@ -7,7 +7,7 @@ import play.api.ApplicationLoader.Context
 import router.Routes
 
 class MetadataEditorComponents(context: Context) extends GridComponents(context) {
-  final override lazy val config = new EditsConfig(configuration, services)
+  final override lazy val config = new EditsConfig(configuration)
   val services = new Services(config)
 
   val store = new EditsStore(config)
@@ -23,7 +23,7 @@ class MetadataEditorComponents(context: Context) extends GridComponents(context)
   }
 
   val editsController = new EditsController(auth, store, notifications, config, controllerComponents, services)
-  val controller = new EditsApi(auth, config, controllerComponents)
+  val controller = new EditsApi(auth, config, controllerComponents, services)
 
   override val router = new Routes(httpErrorHandler, controller, editsController, management)
 }
