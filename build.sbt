@@ -128,36 +128,16 @@ def project(projectName: String, path: Option[String] = None): Project =
   Project(projectName, file(path.getOrElse(projectName)))
     .settings(commonSettings)
 
-def playProject(projectName: String, port: Int): Project =
+def playProject(projectName: String, port: Int): Project = {
   project(projectName, None)
-    .enablePlugins(PlayScala, JDebPackaging, SystemdPlugin, RiffRaffArtifact, BuildInfoPlugin)
+    .enablePlugins(PlayScala, BuildInfoPlugin, DockerPlugin)
     .dependsOn(commonLib)
     .settings(commonSettings ++ Seq(
       playDefaultPort := port,
-
-      debianPackageDependencies := Seq("openjdk-8-jre-headless"),
-      maintainer in Linux := "Guardian Developers <dig.dev.software@theguardian.com>",
-      packageSummary in Linux := description.value,
-      packageDescription := description.value,
-
-      mappings in Universal ++= Seq(
-        file("common-lib/src/main/resources/application.conf") -> "conf/application.conf",
-        file("common-lib/src/main/resources/logback.xml") -> "conf/logback.xml"
-      ),
-      javaOptions in Universal ++= Seq(
-        "-Dpidfile.path=/dev/null",
-        s"-Dconfig.file=/usr/share/$projectName/conf/application.conf",
-        s"-Dlogger.file=/usr/share/$projectName/conf/logback.xml"
-      ),
-
-      riffRaffManifestProjectName := s"media-service::grid::${name.value}",
-      riffRaffUploadArtifactBucket := Some("riffraff-artifact"),
-      riffRaffUploadManifestBucket := Some("riffraff-builds"),
-      riffRaffArtifactResources := Seq(
-        (packageBin in Debian).value -> s"${name.value}/${name.value}.deb",
-        file(s"$projectName/conf/riff-raff.yaml") -> "riff-raff.yaml"
-      )
+      dockerBaseImage := "openjdk:8-jre",
+      dockerExposedPorts in Docker := Seq(port),
     ))
+}
 
 val testSettings = Seq(
   testOptions in Test += Tests.Setup(_ => {
