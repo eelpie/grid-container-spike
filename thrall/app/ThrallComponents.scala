@@ -12,8 +12,7 @@ import com.gu.mediaservice.lib.config.Services
 class ThrallComponents(context: Context) extends GridComponents(context) {
 
   final override lazy val config = new ThrallConfig(configuration)
-
-  val services = new Services(config)
+  final override lazy val services = new Services(config)
 
   val store = new ThrallStore(config)
   val dynamoNotifications = new DynamoNotifications(config)
