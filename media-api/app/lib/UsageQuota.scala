@@ -18,13 +18,13 @@ case class NoUsageQuota() extends Exception("No usage found for this image")
 
 class UsageQuota(config: MediaApiConfig, elasticSearch: ElasticSearchVersion, scheduler: Scheduler) {
   val quotaStore = new QuotaStore(
-    config.quotaStoreConfig.storeKey,
-    config.quotaStoreConfig.storeBucket,
+    config.quotaStoreFile,
+    config.quotaStoreBucket,
     config
   )
 
   val usageStore = new UsageStore(
-    config.usageMailBucket,
+    config.usageStoreBucket,
     config,
     quotaStore
   )

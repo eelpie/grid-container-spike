@@ -6,20 +6,14 @@ import play.api.Configuration
 
 import scala.util.Try
 
-case class StoreConfig(
-  storeBucket: String,
-  storeKey: String
-)
-
 class MediaApiConfig(override val configuration: Configuration) extends CommonConfig {
 
   final override lazy val appName = "media-api"
 
-  lazy val configBucket: String = properties("s3.config.bucket")
-  lazy val usageMailBucket: String = properties("s3.usagemail.bucket")
+  lazy val usageStoreBucket: String = properties("s3.usagemail.bucket")
 
-  lazy val quotaStoreKey: String = properties("quota.store.key")
-  lazy val quotaStoreConfig: StoreConfig = StoreConfig(configBucket, quotaStoreKey)
+  lazy val quotaStoreBucket: String = properties("s3.config.bucket")
+  lazy val quotaStoreFile: String = properties("quota.store.key")
 
   // quota updates can only be turned off in DEV
   lazy val quotaUpdateEnabled: Boolean = if (isDev) properties.getOrElse("quota.update.enabled", "false").toBoolean else true
