@@ -39,7 +39,7 @@ trait CommonConfig {
   val awsSecretKey =  configuration.get[String]("ec2.secretKey")
   lazy val awsCredentials = new AWSStaticCredentialsProvider(new BasicAWSCredentials(awsAccessKey, awsSecretKey))
 
-  lazy val awsRegion = properties.getOrElse("aws.region", "eu-west-1")
+  lazy val awsRegion = configuration.getOptional[String]("aws.region").getOrElse("eu-west-1")
 
   def withAWSCredentials[T, S <: AwsClientBuilder[S, T]](builder: AwsClientBuilder[S, T]): S = builder
     .withRegion(awsRegion)
@@ -52,18 +52,11 @@ trait CommonConfig {
 
   final val thrallKinesisStream = s"$stackName-thrall-$stage"
 
-  final def apply(key: String): String =
-    string(key)
+  val loggerKinesisStream = configuration.get[String]("logger.kinesis.stream")
+  val loggerKinesisRegion = configuration.get[String]("logger.kinesis.region")
+  val loggerKinesisRoleArn = configuration.get[String]("logger.kinesis.roleArn")
 
-  final def string(key: String): String =
-    configuration.getOptional[String](key) getOrElse missing(key, "string")
-
-  final def int(key: String): Int =
-    configuration.getOptional[Int](key) getOrElse missing(key, "integer")
-
-  private def missing(key: String, type_ : String): Nothing =
-    sys.error(s"Required $type_ configuration property missing: $key")
-
+  // TODO purge
   private def stageFromFile: Option[String] = {
     val file = new File("/etc/gu/stage")
     if (file.exists) Some(fromFile(file).mkString.trim) else None

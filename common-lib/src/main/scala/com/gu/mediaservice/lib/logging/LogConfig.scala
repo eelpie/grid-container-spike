@@ -12,7 +12,6 @@ import play.api.libs.json._
 import scalaz.syntax.id._
 import scala.util.Try
 
-
 object LogConfig {
 
   val rootLogger: LogbackLogger = LoggerFactory.getLogger(SLFLogger.ROOT_LOGGER_NAME).asInstanceOf[LogbackLogger]
@@ -59,9 +58,9 @@ object LogConfig {
 
         val appender     = makeKinesisAppender(layout, context,
           KinesisAppenderConfig(
-            config.properties("logger.kinesis.stream"),
-            config.properties("logger.kinesis.region"),
-            config.properties("logger.kinesis.roleArn"),
+            config.loggerKinesisStream,
+            config.loggerKinesisRegion,
+            config.loggerKinesisRoleArn,
             bufferSize
           )
         )
