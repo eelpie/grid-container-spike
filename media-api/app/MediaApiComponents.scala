@@ -14,7 +14,7 @@ import router.Routes
 
 class MediaApiComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new MediaApiConfig(configuration)
-  val services = new Services(config)
+  lazy val services = new Services(config)
 
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
@@ -22,11 +22,12 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   val mediaApiMetrics = new MediaApiMetrics(config)
 
   val es1Config: Option[ElasticSearchConfig] = for {
+    h <- config.elasticsearchHost
     p <- config.elasticsearchPort
     c <- config.elasticsearchCluster
   } yield {
     ElasticSearchConfig(alias = config.imagesAlias,
-      host = config.elasticsearchHost,
+      host = h,
       port = p,
       cluster = c
     )

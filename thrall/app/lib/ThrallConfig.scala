@@ -26,10 +26,10 @@ class ThrallConfig(override val configuration: Configuration) extends CommonConf
   private lazy val ec2Client = withAWSCredentials(AmazonEC2ClientBuilder.standard()).build()
 
   lazy val imageBucket: String = configuration.get[String]("s3.image.bucket")
+  lazy val thumbnailBucket: String = configuration.get[String]("s3.thumb.bucket")
 
   lazy val writeAlias: String = configuration.get[String]("es.index.aliases.write")
 
-  lazy val thumbnailBucket: String = configuration.get[String]("s3.thumb.bucket")
 
   lazy val healthyMessageRate: Int = configuration.get[Int]("sqs.message.min.frequency")
 
