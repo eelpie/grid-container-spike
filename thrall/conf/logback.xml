@@ -14,7 +14,7 @@
         <level value="ERROR"/>
     </logger>
 
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
