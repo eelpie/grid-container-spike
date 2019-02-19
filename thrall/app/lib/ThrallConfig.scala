@@ -8,6 +8,7 @@ import play.api.{Configuration, Logger}
 
 class ThrallConfig(override val configuration: Configuration) extends CommonConfig {
   Logger.info("Configuring thrall")
+  final override lazy val appName = "thrall"
 
   lazy val elasticsearchPort: Option[Int] = configuration.getOptional[Int]("es.port")
   lazy val elasticsearchCluster: Option[String] = configuration.getOptional[String]("es.cluster")
@@ -20,11 +21,9 @@ class ThrallConfig(override val configuration: Configuration) extends CommonConf
 
   lazy val elasticsearchHost: Option[String] = configuration.getOptional[String]("es.host")
 
+  lazy val queueUrl: String = configuration.get[String]("sqs.queue.url")
+
   private lazy val ec2Client = withAWSCredentials(AmazonEC2ClientBuilder.standard()).build()
-
-  final override lazy val appName = "thrall"
-
-  lazy val queueUrl: String = properties("sqs.queue.url")
 
   lazy val imageBucket: String = properties("s3.image.bucket")
 
