@@ -18,3 +18,37 @@ let services who are interested mix in directly.
 
 Want CommonConfig to respect Play config or the Play app to be able to bypass CommonConfig.
 ThrallConfig has a reference to Play config should do as much as it can from this rather than CommonConfig.
+
+
+
+Exception in thread "pool-38-thread-1" com.amazonaws.services.sqs.model.AmazonSQSException:
+
+Access to the resource https://sqs.eu-west-1.amazonaws.com/563563610310/
+
+media-service-DEV-Queue-CYP1YGR8XC8P is denied. (Service: AmazonSQS; Status Code: 403;
+
+Error Code: AccessDenied; Request ID: c14a68e1-5380-575c-b49e-3c049ed4580f)
+
+
+
+  final override lazy val appName = "thrall"
+
+Code: 403; Error Code: AccessDenied; Request ID: 9B0FFF21D6F21050; S3 Extended Request ID: /+1YdNJ9WzjkYCmISugIvQhvdIIOcEigkHKZ/ShWcN/txBS8KIlvytjcc2KoT+Pe6u7q9WY8rO8=)
+com.amazonaws.services.s3.model.AmazonS3Exception: Access Denied (Service: Amazon S3; Status Code: 403; Error Code: AccessDenied; Request ID: 9B0FFF21D6F21050; S3 Extended Request ID: /+1YdNJ9WzjkYCmISugIvQhvdIIOcEigkHKZ/ShWcN/txBS8KIlvytjcc2KoT+Pe6u7q9WY8rO8=)
+	at com.amazonaws.http.AmazonHttpClient$RequestExecutor.handleErrorResponse(AmazonHttpClient.java:1695)
+	at com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeOneRequest(AmazonHttpClient.java:1350)
+	at com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeHelper(AmazonHttpClient.java:1101)
+	at com.amazonaws.http.AmazonHttpClient$RequestExecutor.doExecute(AmazonHttpClient.java:758)
+	at com.amazonaws.http.AmazonHttpClient$RequestExecutor.executeWithTimer(AmazonHttpClient.java:732)
+	at com.amazonaws.http.AmazonHttpClient$RequestExecutor.execute(AmazonHttpClient.java:714)
+	at com.amazonaws.http.AmazonHttpClient$RequestExecutor.access$500(AmazonHttpClient.java:674)
+	at com.amazonaws.http.AmazonHttpClient$RequestExecutionBuilderImpl.execute(AmazonHttpClient.java:656)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:520)
+	at com.amazonaws.services.s3.AmazonS3Client.invoke(AmazonS3Client.java:4705)
+	at com.amazonaws.services.s3.AmazonS3Client.invoke(AmazonS3Client.java:4652)
+	at com.amazonaws.services.s3.AmazonS3Client.invoke(AmazonS3Client.java:4646)
+	at com.amazonaws.services.s3.AmazonS3Client.listObjects(AmazonS3Client.java:870)
+	at com.amazonaws.services.s3.AmazonS3Client.listObjects(AmazonS3Client.java:838)
+	at com.gu.mediaservice.lib.auth.KeyStore.fetchAll(KeyStore.sca
+
+2019-02-19 09:43:55,496 [play-dev-mode-akka.actor.default-dispatcher-6] INFO  application:42 - Initing keystore with bucket: media-service-dev-keybucket-89v8fl24sngk

@@ -25,18 +25,17 @@ class ThrallConfig(override val configuration: Configuration) extends CommonConf
 
   private lazy val ec2Client = withAWSCredentials(AmazonEC2ClientBuilder.standard()).build()
 
-  lazy val imageBucket: String = properties("s3.image.bucket")
+  lazy val imageBucket: String = configuration.get[String]("s3.image.bucket")
 
-  lazy val writeAlias: String = properties.getOrElse("es.index.aliases.write", configuration.get[String]("es.index.aliases.write"))
+  lazy val writeAlias: String = configuration.get[String]("es.index.aliases.write")
 
-  lazy val thumbnailBucket: String = properties("s3.thumb.bucket")
+  lazy val thumbnailBucket: String = configuration.get[String]("s3.thumb.bucket")
 
-  lazy val healthyMessageRate: Int = properties("sqs.message.min.frequency").toInt
+  lazy val healthyMessageRate: Int = configuration.get[Int]("sqs.message.min.frequency")
 
-  lazy val dynamoTopicArn: String = properties("indexed.image.sns.topic.arn")
+  // TODO what's this for?
+  lazy val dynamoTopicArn: String = configuration.get[String]("indexed.image.sns.topic.arn")
 
-  lazy val topicArn: String = properties("sns.topic.arn")
-
-  lazy val from: Option[DateTime] = properties.get("rewind.from").map(ISODateTimeFormat.dateTime.parseDateTime)
+  lazy val from: Option[DateTime] = configuration.getOptional[String]("rewind.from").map(ISODateTimeFormat.dateTime.parseDateTime)
 
 }
