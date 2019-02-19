@@ -11,6 +11,7 @@ import com.gu.pandomainauth.PanDomainAuthSettingsRefresher
 import com.gu.pandomainauth.action.{AuthActions, UserRequest}
 import com.gu.pandomainauth.model.{AuthenticatedUser, User}
 import com.gu.pandomainauth.service.Google2FAGroupChecker
+import play.api.Logger
 import play.api.libs.ws.WSClient
 import play.api.mvc.Security.AuthenticatedRequest
 import play.api.mvc._
@@ -37,7 +38,8 @@ class Authentication(config: CommonConfig,
   val invalidApiKeyResult    = respondError(Unauthorized, "invalid-api-key", "Invalid API key provided", loginLinks)
 
   private val headerKey = "X-Gu-Media-Key"
-  private val keyStoreBucket: String = config.properties("auth.keystore.bucket")
+  private val keyStoreBucket = config.authKeyStoreBucket
+  Logger.info("Init'ing keystore with bucket: " + keyStoreBucket)
   val keyStore = new KeyStore(keyStoreBucket, config)
 
   keyStore.scheduleUpdates(actorSystem.scheduler)

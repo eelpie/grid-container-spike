@@ -22,6 +22,8 @@ trait CommonConfig {
   // TODO want to drive out this Guardian native config file
   lazy val properties: Map[String, String] = Properties.fromPath(s"/etc/gu/$appName.properties")
 
+  val authKeyStoreBucket: String = properties("auth.keystore.bucket")
+
   final val awsEndpoint = "ec2.eu-west-1.amazonaws.com"
 
   final val elasticsearchStack = "media-service"
