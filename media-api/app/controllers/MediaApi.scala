@@ -33,7 +33,7 @@ class MediaApi(
                 imageResponse: ImageResponse,
                 override val config: MediaApiConfig,
                 override val controllerComponents: ControllerComponents,
-                s3Client: S3Client,
+                imageS3Client: S3Client,
                 mediaApiMetrics: MediaApiMetrics,
                 services: Services)(implicit val ec: ExecutionContext) extends BaseController with ArgoHelpers with PermissionsHandler {
 
@@ -208,12 +208,12 @@ class MediaApi(
         val apiKey = request.user.apiKey
         GridLogger.info(s"Download original image $id", apiKey, id)
         mediaApiMetrics.incrementOriginalImageDownload(apiKey)
-        val s3Object = s3Client.getObject(config.imageBucket, image.source.file)
+        val s3Object = imageS3Client.getObject(config.imageBucket, image.source.file)
         val file = StreamConverters.fromInputStream(() => s3Object.getObjectContent)
         val entity = HttpEntity.Streamed(file, image.source.size, image.source.mimeType)
 
         Future.successful(
-          Result(ResponseHeader(OK), entity).withHeaders("Content-Disposition" -> s3Client.getContentDisposition(image))
+          Result(ResponseHeader(OK), entity).withHeaders("Content-Disposition" -> imageS3Client.getContentDisposition(image))
         )
       }
       case _ => Future.successful(ImageNotFound(id))

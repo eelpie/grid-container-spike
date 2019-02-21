@@ -18,7 +18,7 @@ import play.utils.UriEncoding
 import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Try}
 
-class ImageResponse(config: MediaApiConfig, s3Client: S3Client, usageQuota: UsageQuota, services: Services) extends EditsResponse {
+class ImageResponse(config: MediaApiConfig, thumbnailS3Client: S3Client, usageQuota: UsageQuota, services: Services) extends EditsResponse {
 //  implicit val dateTimeFormat = DateFormat
   implicit val usageQuotas = usageQuota
 
@@ -137,15 +137,15 @@ class ImageResponse(config: MediaApiConfig, s3Client: S3Client, usageQuota: Usag
 
     val fileUri = image.source.file
 
-    val imageUrl = s3Client.signUrl(config.imageBucket, fileUri, image)
+    val imageUrl = thumbnailS3Client.signUrl(config.imageBucket, fileUri, image)
     val pngUrl: Option[String] = pngFileUri
-      .map(s3Client.signUrl(config.imageBucket, _, image))
+      .map(thumbnailS3Client.signUrl(config.imageBucket, _, image))
 
     val cloudFrontSigning = true  // TODO drive from cloud front config
-    def s3SignedThumbUrl = s3Client.signUrl(config.thumbBucket, fileUri, image) // TODO not always used
+    def s3SignedThumbUrl = thumbnailS3Client.signUrl(config.thumbBucket, fileUri, image) // TODO not always used
     val thumbUrl = if(cloudFrontSigning) {
       config.cloudFrontDomainThumbBucket
-        .flatMap(s3Client.signedCloudFrontUrl(_, fileUri.getPath.drop(1)))
+        .flatMap(thumbnailS3Client.signedCloudFrontUrl(_, fileUri.getPath.drop(1)))
         .getOrElse(s3SignedThumbUrl)
     } else { s3SignedThumbUrl }
 
