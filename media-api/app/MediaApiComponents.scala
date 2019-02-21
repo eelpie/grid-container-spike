@@ -68,14 +68,15 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   val elasticSearch: ElasticSearchVersion = new lib.elasticsearch.TogglingElasticSearch(elasticSearches.head, elasticSearches.last)
   elasticSearch.ensureAliasAssigned()
 
-  val s3Client = new S3Client(config)
+  val imageS3Client = new S3Client(config)
+  val thumbnailS3Client = new S3Client(config)
 
   val usageQuota = new UsageQuota(config, elasticSearch, actorSystem.scheduler)
   usageQuota.scheduleUpdates()
 
-  val imageResponse = new ImageResponse(config, s3Client, usageQuota, services)
+  val imageResponse = new ImageResponse(config, thumbnailS3Client, usageQuota, services)
 
-  val mediaApi = new MediaApi(auth, messageSender, elasticSearch, imageResponse, config, controllerComponents, s3Client, mediaApiMetrics, services)
+  val mediaApi = new MediaApi(auth, messageSender, elasticSearch, imageResponse, config, controllerComponents, imageS3Client, mediaApiMetrics, services)
   val suggestionController = new SuggestionController(auth, elasticSearch, controllerComponents)
   val aggController = new AggregationController(auth, elasticSearch, controllerComponents)
   val usageController = new UsageController(auth, config, elasticSearch, usageQuota, controllerComponents)
