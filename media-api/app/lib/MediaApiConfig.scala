@@ -36,8 +36,8 @@ class MediaApiConfig(override val configuration: Configuration) extends CommonCo
   lazy val imageBucket: String = configuration.get[String]("s3.image.bucket")
   lazy val thumbBucket: String = configuration.get[String]("s3.thumb.bucket")
 
-  lazy val cloudFrontPrivateKeyLocation: String = "/etc/gu/ssl/private/cloudfront.pem"
   lazy val cloudFrontDomainThumbBucket: Option[String] = properties.get("cloudfront.domain.thumbbucket")
+  lazy val cloudFrontPrivateKeyLocation: String = "/etc/gu/ssl/private/cloudfront.pem"
   lazy val cloudFrontKeyPairId: Option[String]         = properties.get("cloudfront.keypair.id")
 
   lazy val topicArn: String = configuration.get[String]("sns.topic.arn")

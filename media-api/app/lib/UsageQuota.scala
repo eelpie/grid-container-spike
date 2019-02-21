@@ -1,7 +1,6 @@
 package lib
 
 import akka.actor.Scheduler
-import com.gu.mediaservice.lib.FeatureToggle
 import com.gu.mediaservice.lib.auth.Authentication.Principal
 import com.gu.mediaservice.model.UsageRights
 import lib.elasticsearch.ElasticSearchVersion
@@ -34,11 +33,14 @@ class UsageQuota(config: MediaApiConfig, elasticSearch: ElasticSearchVersion, sc
     usageStore.scheduleUpdates(scheduler)
   }
 
-  def isOverQuota(rights: UsageRights, waitMillis: Int = 100) = Try {
-    Await.result(
-      usageStore.getUsageStatusForUsageRights(rights),
-      waitMillis.millis)
-  }.toOption.exists(_.exceeded) && FeatureToggle.get("usage-quota-ui")
+  def isOverQuota(rights: UsageRights, waitMillis: Int = 100) = {
+    val useUsageQuotaUI = true  // TODO push to config
+    Try {
+      Await.result(
+        usageStore.getUsageStatusForUsageRights(rights),
+        waitMillis.millis)
+    }.toOption.exists(_.exceeded) && useUsageQuotaUI
+  }
 
   def usageStatusForImage(id: String)(implicit request: AuthenticatedRequest[AnyContent, Principal]): Future[UsageStatus] = for {
     imageOption <- elasticSearch.getImageById(id)

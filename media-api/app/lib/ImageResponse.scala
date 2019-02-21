@@ -2,7 +2,6 @@ package lib
 
 import java.net.URI
 
-import com.gu.mediaservice.lib.FeatureToggle
 import com.gu.mediaservice.lib.argo.model._
 import com.gu.mediaservice.lib.auth.{Internal, Tier}
 import com.gu.mediaservice.lib.collections.CollectionsManager
@@ -142,8 +141,9 @@ class ImageResponse(config: MediaApiConfig, s3Client: S3Client, usageQuota: Usag
     val pngUrl: Option[String] = pngFileUri
       .map(s3Client.signUrl(config.imageBucket, _, image))
 
-    def s3SignedThumbUrl = s3Client.signUrl(config.thumbBucket, fileUri, image)
-    val thumbUrl = if(FeatureToggle.get("cloudfront-signing")) {
+    val cloudFrontSigning = true  // TODO drive from cloud front config
+    def s3SignedThumbUrl = s3Client.signUrl(config.thumbBucket, fileUri, image) // TODO not always used
+    val thumbUrl = if(cloudFrontSigning) {
       config.cloudFrontDomainThumbBucket
         .flatMap(s3Client.signedCloudFrontUrl(_, fileUri.getPath.drop(1)))
         .getOrElse(s3SignedThumbUrl)
