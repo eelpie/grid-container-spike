@@ -19,7 +19,7 @@ import play.utils.UriEncoding
 import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Try}
 
-class ImageResponse(config: MediaApiConfig, imageBucket: ImageBucket, thumbnailBucket: ImageBucket, usageQuota: UsageQuota, services: Services) extends EditsResponse {
+class ImageResponse(config: MediaApiConfig, imageBucket: ImageBucket, thumbnailBucket: ImageBucket, usageQuota: Option[UsageQuota], services: Services) extends EditsResponse {
   implicit val usageQuotas = usageQuota
 
   object Costing extends CostCalculator {

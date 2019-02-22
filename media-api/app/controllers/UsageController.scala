@@ -10,17 +10,17 @@ import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class UsageController(auth: Authentication, config: MediaApiConfig, elasticSearch: ElasticSearchVersion, usageQuota: UsageQuota,
+class UsageController(auth: Authentication, config: MediaApiConfig, elasticSearch: ElasticSearchVersion, usageQuota: Option[UsageQuota],
                       override val controllerComponents: ControllerComponents)(implicit val ec: ExecutionContext)
   extends BaseController with ArgoHelpers {
 
-  val numberOfDayInPeriod = 30
+  val numberOfDaysInPeriod = 30
 
   def bySupplier = auth.async { request =>
     implicit val r = request
 
     Future.sequence(
-      Agencies.all.keys.map(elasticSearch.usageForSupplier(_, numberOfDayInPeriod)))
+      Agencies.all.keys.map(elasticSearch.usageForSupplier(_, numberOfDaysInPeriod)))
         .map(_.toList)
         .map((s: List[SupplierUsageSummary]) => respond(s))
         .recover {
@@ -31,7 +31,7 @@ class UsageController(auth: Authentication, config: MediaApiConfig, elasticSearc
   def forSupplier(id: String) = auth.async { request =>
     implicit val r = request
 
-    elasticSearch.usageForSupplier(id, numberOfDayInPeriod)
+    elasticSearch.usageForSupplier(id, numberOfDaysInPeriod)
       .map((s: SupplierUsageSummary) => respond(s))
       .recover {
         case e => respondError(InternalServerError, "unknown-error", e.toString)
@@ -42,19 +42,28 @@ class UsageController(auth: Authentication, config: MediaApiConfig, elasticSearc
   def quotaForImage(id: String) = auth.async { request =>
     implicit val r = request
 
-    usageQuota.usageStatusForImage(id)
-      .map((u: UsageStatus) => respond(u))
-      .recover {
-        case e: ImageNotFound => respondError(NotFound, "image-not-found", e.toString)
-        case e => respondError(InternalServerError, "unknown-error", e.toString)
-      }
+    usageQuota.map { usageQuota =>
+      usageQuota.usageStatusForImage(id)
+        .map((u: UsageStatus) => respond(u))
+        .recover {
+          case e: ImageNotFound => respondError(NotFound, "image-not-found", e.toString)
+          case e => respondError(InternalServerError, "unknown-error", e.toString)
+        }
+    }.getOrElse {
+      Future.successful(NotImplemented)
+    }
   }
 
   def quotas = auth.async { request =>
-    usageQuota.usageStore.getUsageStatus()
-      .map((s: StoreAccess) => respond(s))
-      .recover {
-        case e => respondError(InternalServerError, "unknown-error", e.toString)
-      }
+    usageQuota.map { usageQuota =>
+      usageQuota.usageStore.getUsageStatus()
+        .map((s: StoreAccess) => respond(s))
+        .recover {
+          case e => respondError(InternalServerError, "unknown-error", e.toString)
+        }
+    }.getOrElse {
+      Future.successful(NotImplemented)
+    }
   }
+
 }

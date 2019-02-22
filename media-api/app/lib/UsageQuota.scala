@@ -15,7 +15,7 @@ import scala.util.Try
 case class ImageNotFound() extends Exception("Image not found")
 case class NoUsageQuota() extends Exception("No usage found for this image")
 
-class UsageQuota(quotaStore: QuotaStore, usageStore: UsageStore, config: MediaApiConfig, elasticSearch: ElasticSearchVersion, scheduler: Scheduler) {
+class UsageQuota(quotaStore: QuotaStore, val usageStore: UsageStore, config: MediaApiConfig, elasticSearch: ElasticSearchVersion, scheduler: Scheduler) {
 
   def scheduleUpdates(): Unit = {
     quotaStore.scheduleUpdates(scheduler)

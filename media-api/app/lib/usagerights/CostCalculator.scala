@@ -8,7 +8,7 @@ trait CostCalculator {
   import UsageRightsConfig.{freeSuppliers, suppliersCollectionExcl}
 
   val defaultCost = Pay
-  val quotas: UsageQuota
+  val quotas: Option[UsageQuota]
 
   def getCost(supplier: String, collection: Option[String]): Option[Cost] = {
       val free = isFreeSupplier(supplier) && ! collection.exists(isExcludedColl(supplier, _))
@@ -21,12 +21,15 @@ trait CostCalculator {
   def isPay(usageRights: UsageRights): Boolean =
     getCost(usageRights) == Pay
 
-  def getOverQuota(usageRights: UsageRights) =
-    if (quotas.isOverQuota(usageRights)) {
-      Some(Overquota)
-    } else {
-      None
+  def getOverQuota(usageRights: UsageRights): Option[Overquota.type] = {
+    quotas.flatMap { uq =>
+      if (uq.isOverQuota(usageRights)) {
+        Some(Overquota)
+      } else {
+        None
+      }
     }
+  }
 
   def getCost(usageRights: UsageRights): Cost = {
       val restricted  : Option[Cost] = usageRights.restrictions.map(r => Conditional)
