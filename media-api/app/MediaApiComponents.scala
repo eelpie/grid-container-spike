@@ -76,18 +76,24 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
     new S3ImageBucket(config, config.thumbBucket)
   }
 
-  val quotaStore = new QuotaStore(
-    config.quotaStoreFile,
-    config.quotaStoreBucket,
-    config
-  )
-  val usageStore = new UsageStore(
-    config.usageStoreBucket,
-    config,
-    quotaStore
-  )
-  val usageQuota = new UsageQuota(quotaStore, usageStore, config, elasticSearch, actorSystem.scheduler)
-  usageQuota.scheduleUpdates()
+  // TODO Make quota features optional
+  val enabledUsageQuota = if (config.quotaUpdateEnabled) {  // TODO Best config key to hook this off?
+    val quotaStore = new QuotaStore(
+      config.quotaStoreFile,
+      config.quotaStoreBucket,
+      config
+    )
+    val usageStore = new UsageStore(
+      config.usageStoreBucket,
+      config,
+      quotaStore
+    )
+    val usageQuota = new UsageQuota(quotaStore, usageStore, config, elasticSearch, actorSystem.scheduler)
+    usageQuota.scheduleUpdates()
+    Some(usageQuota)
+  } else {
+    None
+  }
 
   val imageResponse = new ImageResponse(config, imageBucket, thumbnailBucket, usageQuota, services)
 
