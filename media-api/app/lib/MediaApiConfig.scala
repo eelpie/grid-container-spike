@@ -36,16 +36,13 @@ class MediaApiConfig(override val configuration: Configuration) extends CommonCo
   lazy val imageBucket: String = configuration.get[String]("s3.image.bucket")
   lazy val thumbBucket: String = configuration.get[String]("s3.thumb.bucket")
 
-  case class CloudFrontConfiguration(cloudFrontDomainThumbBucket: String,
-                                     cloudFrontPrivateKeyLocation: String,
-                                     cloudFrontKeyPairId: String)
+  case class CloudFrontConfiguration(cloudFrontPrivateKeyLocation: String, cloudFrontKeyPairId: String)
 
   lazy val cloudFrontConfiguration = for {
-    cloudFrontDomainThumbBucket <- configuration.getOptional[String]("cloudfront.domain.thumbbucket")
     cloudFrontPrivateKeyLocation <- configuration.getOptional[String]("cloudfront.private.key.location")
     cloudFrontKeyPairId <-  configuration.getOptional[String]("cloudfront.keypair.id")
   } yield {
-    CloudFrontConfiguration(cloudFrontDomainThumbBucket, cloudFrontPrivateKeyLocation, cloudFrontDomainThumbBucket)
+    CloudFrontConfiguration(cloudFrontPrivateKeyLocation, cloudFrontKeyPairId)
   }
 
   lazy val topicArn: String = configuration.get[String]("sns.topic.arn")

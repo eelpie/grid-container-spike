@@ -8,6 +8,7 @@ import com.gu.mediaservice.lib.play.GridComponents
 import controllers._
 import lib._
 import lib.elasticsearch.ElasticSearchVersion
+import lib.imagebuckets.{CloudFrontImageBucket, S3ImageBucket}
 import play.api.ApplicationLoader.Context
 import play.api.Logger
 import router.Routes
@@ -68,15 +69,18 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   val elasticSearch: ElasticSearchVersion = new lib.elasticsearch.TogglingElasticSearch(elasticSearches.head, elasticSearches.last)
   elasticSearch.ensureAliasAssigned()
 
-  val imageS3Client = new S3Client(config)
-  val thumbnailS3Client = new S3Client(config)
-
+  val imageBucket = new S3ImageBucket(config, config.imageBucket)
+  val thumbnailBucket = config.cloudFrontConfiguration.map { c =>
+    new CloudFrontImageBucket(config, config.thumbBucket, c.cloudFrontPrivateKeyLocation, c.cloudFrontKeyPairId)
+  }.getOrElse{
+    new S3ImageBucket(config, config.thumbBucket)
+  }
   val usageQuota = new UsageQuota(config, elasticSearch, actorSystem.scheduler)
   usageQuota.scheduleUpdates()
 
-  val imageResponse = new ImageResponse(config, thumbnailS3Client, usageQuota, services)
+  val imageResponse = new ImageResponse(config, imageBucket, thumbnailBucket, usageQuota, services)
 
-  val mediaApi = new MediaApi(auth, messageSender, elasticSearch, imageResponse, config, controllerComponents, imageS3Client, mediaApiMetrics, services)
+  val mediaApi = new MediaApi(auth, messageSender, elasticSearch, imageResponse, config, controllerComponents, imageBucket, mediaApiMetrics, services)
   val suggestionController = new SuggestionController(auth, elasticSearch, controllerComponents)
   val aggController = new AggregationController(auth, elasticSearch, controllerComponents)
   val usageController = new UsageController(auth, config, elasticSearch, usageQuota, controllerComponents)

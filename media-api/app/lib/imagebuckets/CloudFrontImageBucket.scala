@@ -1,10 +1,12 @@
 package lib.imagebuckets
 
 import java.io.File
+import java.net.URI
 
 import com.amazonaws.services.cloudfront.CloudFrontUrlSigner
 import com.amazonaws.services.cloudfront.util.SignerUtils.Protocol
 import com.gu.mediaservice.lib.aws.S3
+import com.gu.mediaservice.model.Image
 import lib.MediaApiConfig
 import org.joda.time.DateTime
 
@@ -26,4 +28,12 @@ trait CloudFrontDistributable {
   }.toOption
 }
 
-class CloudFrontAwareS3Client(config: MediaApiConfig, val cloudFrontDomain: String, val privateKeyLocation: String, val keyPairId: String) extends S3(config) with CloudFrontDistributable
+class CloudFrontImageBucket(config: MediaApiConfig, val cloudFrontDomain: String, val privateKeyLocation: String, val keyPairId: String)
+  extends S3(config) with CloudFrontDistributable with ImageBucket {
+
+  override def signedUrlFor(uri: URI, image: Image): String = {
+    val path = uri.getPath.drop(1)
+    signedCloudFrontUrl(path).get   // TODO Naked get
+  }
+
+}

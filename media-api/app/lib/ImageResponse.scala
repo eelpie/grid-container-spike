@@ -8,6 +8,7 @@ import com.gu.mediaservice.lib.collections.CollectionsManager
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.model._
 import com.gu.mediaservice.model.usage._
+import lib.imagebuckets.ImageBucket
 import lib.usagerights.CostCalculator
 import org.joda.time.DateTime
 import play.api.Logger
@@ -18,8 +19,7 @@ import play.utils.UriEncoding
 import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Try}
 
-class ImageResponse(config: MediaApiConfig, thumbnailS3Client: S3Client, usageQuota: UsageQuota, services: Services) extends EditsResponse {
-//  implicit val dateTimeFormat = DateFormat
+class ImageResponse(config: MediaApiConfig, imageBucket: ImageBucket, thumbnailBucket: ImageBucket, usageQuota: UsageQuota, services: Services) extends EditsResponse {
   implicit val usageQuotas = usageQuota
 
   object Costing extends CostCalculator {
@@ -137,17 +137,10 @@ class ImageResponse(config: MediaApiConfig, thumbnailS3Client: S3Client, usageQu
 
     val fileUri = image.source.file
 
-    val imageUrl = thumbnailS3Client.signUrl(config.imageBucket, fileUri, image)
-    val pngUrl: Option[String] = pngFileUri
-      .map(thumbnailS3Client.signUrl(config.imageBucket, _, image))
+    val imageUrl: String = imageBucket.signedUrlFor(fileUri, image)
+    val pngUrl: Option[String] = pngFileUri.map(thumbnailBucket.signedUrlFor(_, image))
 
-    val cloudFrontSigning = true  // TODO drive from cloud front config
-    def s3SignedThumbUrl = thumbnailS3Client.signUrl(config.thumbBucket, fileUri, image) // TODO not always used
-    val thumbUrl = if(cloudFrontSigning) {
-      config.cloudFrontDomainThumbBucket
-        .flatMap(thumbnailS3Client.signedCloudFrontUrl(_, fileUri.getPath.drop(1)))
-        .getOrElse(s3SignedThumbUrl)
-    } else { s3SignedThumbUrl }
+    val thumbUrl = thumbnailBucket.signedUrlFor(fileUri, image)
 
     val validityMap       = ImageExtras.validityMap(image, withWritePermission)
     val valid             = ImageExtras.isValid(validityMap)

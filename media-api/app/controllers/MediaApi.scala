@@ -17,6 +17,7 @@ import com.gu.mediaservice.model._
 import com.gu.permissions.PermissionDefinition
 import lib._
 import lib.elasticsearch._
+import lib.imagebuckets.S3ImageBucket
 import org.http4s.UriTemplate
 import org.joda.time.DateTime
 import play.api.http.HttpEntity
@@ -33,7 +34,7 @@ class MediaApi(
                 imageResponse: ImageResponse,
                 override val config: MediaApiConfig,
                 override val controllerComponents: ControllerComponents,
-                imageS3Client: S3Client,
+                imageS3Client: S3ImageBucket,
                 mediaApiMetrics: MediaApiMetrics,
                 services: Services)(implicit val ec: ExecutionContext) extends BaseController with ArgoHelpers with PermissionsHandler {
 
