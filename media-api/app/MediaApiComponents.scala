@@ -75,7 +75,18 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   }.getOrElse{
     new S3ImageBucket(config, config.thumbBucket)
   }
-  val usageQuota = new UsageQuota(config, elasticSearch, actorSystem.scheduler)
+
+  val quotaStore = new QuotaStore(
+    config.quotaStoreFile,
+    config.quotaStoreBucket,
+    config
+  )
+  val usageStore = new UsageStore(
+    config.usageStoreBucket,
+    config,
+    quotaStore
+  )
+  val usageQuota = new UsageQuota(quotaStore, usageStore, config, elasticSearch, actorSystem.scheduler)
   usageQuota.scheduleUpdates()
 
   val imageResponse = new ImageResponse(config, imageBucket, thumbnailBucket, usageQuota, services)
