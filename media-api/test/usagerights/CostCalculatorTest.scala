@@ -12,12 +12,12 @@ class CostCalculatorTest extends FunSpec with Matchers with MockitoSugar {
     val Quota = mock[UsageQuota]
 
     object Costing extends CostCalculator {
-      val quotas = Quota
+      val quotas = Some(Quota)
       override def getOverQuota(usageRights: UsageRights) = None
     }
 
     object OverQuotaCosting extends CostCalculator {
-      val quotas = Quota
+      val quotas = Some(Quota)
       override def getOverQuota(usageRights: UsageRights) = Some(Overquota)
     }
 
