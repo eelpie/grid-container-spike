@@ -11,7 +11,13 @@ trait PermissionsHandler {
   def config: CommonConfig
 
   private val permissionsStage = if(config.stage == "PROD") { "PROD" } else { "CODE" }
-  private val permissions = PermissionsProvider(PermissionsConfig(permissionsStage, config.awsRegion, config.awsCredentials))
+
+  private val permissionsConfig = PermissionsConfig(
+    stage = permissionsStage,
+    region = config.awsRegion,
+    awsCredentials = config.awsCredentials)
+
+  private val permissions = PermissionsProvider(permissionsConfig)
 
   def storeIsEmpty: Boolean = {
     permissions.storeIsEmpty
