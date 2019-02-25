@@ -16,10 +16,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class AuthController(auth: Authentication, val config: AuthConfig,
-                     override val controllerComponents: ControllerComponents, services: Services)(implicit ec: ExecutionContext)
+                     override val controllerComponents: ControllerComponents, services: Services, permissionsHandler: PermissionsHandler)(implicit ec: ExecutionContext)
   extends BaseController
-  with ArgoHelpers
-  with PermissionsHandler {
+  with ArgoHelpers {
 
   val indexResponse = {
     val indexData = Map("description" -> "This is the Auth API")
@@ -39,7 +38,7 @@ class AuthController(auth: Authentication, val config: AuthConfig,
     val firstName = user.firstName
     val lastName = user.lastName
 
-    val showPaid = hasPermission(PandaUser(request.user), Permissions.ShowPaid)
+    val showPaid = permissionsHandler.hasPermission(PandaUser(request.user), Permissions.ShowPaid)
 
     respond(
       Json.obj("user" ->

@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.auth.GuardianEditorialPermissionsHandler
 import com.gu.mediaservice.lib.aws.MessageSender
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.elasticsearch.ElasticSearchConfig
@@ -91,11 +92,13 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
 
   val imageResponse = new ImageResponse(config, imageBucket, thumbnailBucket, enabledUsageQuota, services)
 
-  val mediaApi = new MediaApi(auth, messageSender, elasticSearch, imageResponse, config, controllerComponents, imageBucket, mediaApiMetrics, services)
+  val permissionsHandler = new GuardianEditorialPermissionsHandler(config)
+  val mediaApi = new MediaApi(auth, messageSender, elasticSearch, imageResponse, config, controllerComponents, imageBucket,
+    mediaApiMetrics, services, permissionsHandler)
   val suggestionController = new SuggestionController(auth, elasticSearch, controllerComponents)
   val aggController = new AggregationController(auth, elasticSearch, controllerComponents)
   val usageController = new UsageController(auth, config, elasticSearch, enabledUsageQuota, controllerComponents)
-  val healthcheckController = new ManagementWithPermissions(controllerComponents, mediaApi)
+  val healthcheckController = new ManagementWithPermissions(controllerComponents, permissionsHandler)
 
   override val router = new Routes(httpErrorHandler, mediaApi, suggestionController, aggController, usageController, healthcheckController)
 }

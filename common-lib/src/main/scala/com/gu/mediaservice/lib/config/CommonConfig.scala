@@ -56,6 +56,9 @@ trait CommonConfig {
   val loggerKinesisRegion = configuration.get[String]("logger.kinesis.region")
   val loggerKinesisRoleArn = configuration.get[String]("logger.kinesis.roleArn")
 
+  val permissionsBucket = configuration.get[String]("permissions.bucket")
+  val permissionsStage = configuration.get[String]("permissions.stage") // TODO Do not want
+
   // TODO purge
   private def stageFromFile: Option[String] = {
     val file = new File("/etc/gu/stage")

@@ -32,11 +32,13 @@ class MediaApi(
                 messageSender: MessageSender,
                 elasticSearch: ElasticSearchVersion,
                 imageResponse: ImageResponse,
-                override val config: MediaApiConfig,
+                val config: MediaApiConfig,
                 override val controllerComponents: ControllerComponents,
                 imageS3Client: S3ImageBucket,
                 mediaApiMetrics: MediaApiMetrics,
-                services: Services)(implicit val ec: ExecutionContext) extends BaseController with ArgoHelpers with PermissionsHandler {
+                services: Services,
+                permissionsHandler: PermissionsHandler
+              )(implicit val ec: ExecutionContext) extends BaseController with ArgoHelpers {
 
   private val searchParamList = List("q", "ids", "offset", "length", "orderBy",
     "since", "until", "modifiedSince", "modifiedUntil", "takenSince", "takenUntil",
@@ -96,7 +98,7 @@ class MediaApi(
         if (user.user.email.toLowerCase == image.uploadedBy.toLowerCase) {
           true
         } else {
-          hasPermission(user, permission)
+          permissionsHandler.hasPermission(user, permission)
         }
       case _: AuthenticatedService => true
       case _ => false

@@ -20,15 +20,14 @@ import org.joda.time.DateTime
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-
 case object InvalidSource extends Exception("Invalid source URI, not a media API URI")
 case object ImageNotFound extends Exception("No such image found")
 case object ApiRequestFailed extends Exception("Failed to fetch the source")
 
 class CropperController(auth: Authentication, crops: Crops, store: CropStore, notifications: Notifications,
-                        override val config: CropperConfig,
-                        override val controllerComponents: ControllerComponents, services: Services)(implicit val ec: ExecutionContext)
-  extends BaseController with ArgoHelpers with PermissionsHandler {
+                        val config: CropperConfig,
+                        override val controllerComponents: ControllerComponents, services: Services, permissionsHandler: PermissionsHandler)(implicit val ec: ExecutionContext)
+  extends BaseController with ArgoHelpers {
 
   // Stupid name clash between Argo and Play
   import com.gu.mediaservice.lib.argo.model.{Action => ArgoAction}
@@ -93,7 +92,7 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
         link = Link("image", crop.specification.uri)
       } yield List(link)) getOrElse List()
 
-      val canDeleteCrops = hasPermission(httpRequest.user, Permissions.DeleteCrops)
+      val canDeleteCrops = permissionsHandler.hasPermission(httpRequest.user, Permissions.DeleteCrops)
 
       if(canDeleteCrops && crops.nonEmpty) {
         respond(crops, links, List(deleteCropsAction))
@@ -104,7 +103,7 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
   }
 
   def deleteCrops(id: String) = auth.async { httpRequest =>
-    val canDeleteCrops = hasPermission(httpRequest.user, Permissions.DeleteCrops)
+    val canDeleteCrops = permissionsHandler.hasPermission(httpRequest.user, Permissions.DeleteCrops)
 
     if(canDeleteCrops) {
       store.deleteCrops(id).map { _ =>

@@ -4,26 +4,27 @@ import com.gu.mediaservice.lib.auth.Authentication.{AuthenticatedService, PandaU
 import com.gu.mediaservice.lib.config.CommonConfig
 import com.gu.permissions.{PermissionDefinition, PermissionsConfig, PermissionsProvider}
 
-
-object PermissionDeniedError extends Throwable("Permission denied")
-
 trait PermissionsHandler {
-  def config: CommonConfig
+  def storeIsEmpty: Boolean
+  def hasPermission(user: Principal, permission: PermissionDefinition): Boolean
+}
 
-  private val permissionsStage = if(config.stage == "PROD") { "PROD" } else { "CODE" }
+class GuardianEditorialPermissionsHandler(config: CommonConfig) extends PermissionsHandler {
 
   private val permissionsConfig = PermissionsConfig(
-    stage = permissionsStage,
+    stage = config.permissionsStage,
     region = config.awsRegion,
-    awsCredentials = config.awsCredentials)
+    awsCredentials = config.awsCredentials,
+    s3Bucket = config.permissionsBucket
+  )
 
   private val permissions = PermissionsProvider(permissionsConfig)
 
-  def storeIsEmpty: Boolean = {
+  override def storeIsEmpty: Boolean = {
     permissions.storeIsEmpty
   }
 
-  def hasPermission(user: Principal, permission: PermissionDefinition): Boolean = {
+  override def hasPermission(user: Principal, permission: PermissionDefinition): Boolean = {
     user match {
       case PandaUser(u) => permissions.hasPermission(permission, u.email)
       // think about only allowing certain services i.e. on `service.name`?
@@ -31,4 +32,7 @@ trait PermissionsHandler {
       case _ => false
     }
   }
+
 }
+
+object PermissionDeniedError extends Throwable("Permission denied")

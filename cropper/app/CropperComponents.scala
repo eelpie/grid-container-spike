@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.auth.GuardianEditorialPermissionsHandler
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.imaging.ImageOperations
 import com.gu.mediaservice.lib.management.ManagementWithPermissions
@@ -18,8 +19,9 @@ class CropperComponents(context: Context) extends GridComponents(context) {
   val crops = new Crops(config, store, imageOperations)
   val notifications = new Notifications(config)
 
-  val controller = new CropperController(auth, crops, store, notifications, config, controllerComponents, services)
-  val permissionsAwareManagement = new ManagementWithPermissions(controllerComponents, controller)
+  val permissionsHandler = new GuardianEditorialPermissionsHandler(config)
+  val controller = new CropperController(auth, crops, store, notifications, config, controllerComponents, services, permissionsHandler)
+  val permissionsAwareManagement = new ManagementWithPermissions(controllerComponents, permissionsHandler)
 
   override lazy val router = new Routes(httpErrorHandler, controller, permissionsAwareManagement)
 }
