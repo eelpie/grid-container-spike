@@ -10,15 +10,15 @@ import org.scalatest.{FunSpec, Matchers}
 
 class ImageExtrasTest extends FunSpec with Matchers with MockitoSugar {
 
-  val Quota = mock[UsageQuota]
+  val Quotas = mock[UsageQuota]
 
   object Costing extends CostCalculator {
-    val quotas = Quota
+    val quotas = Some(Quotas)
     override def getOverQuota(usageRights: UsageRights) = None
   }
 
-  implicit val cost: CostCalculator = Costing
-  implicit val quotas: UsageQuota = Quota
+  implicit val cost = Costing
+  implicit val quotas = Some(Quotas)
 
   val baseImage = Image(
     id = "id",
