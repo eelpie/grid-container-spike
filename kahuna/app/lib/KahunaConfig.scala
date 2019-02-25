@@ -7,11 +7,12 @@ class KahunaConfig(override val configuration: Configuration) extends CommonConf
 
   final override lazy val appName = "kahuna"
 
-  val sentryDsn: Option[String] = properties.get("sentry.dsn").filterNot(_.isEmpty)
+  val sentryDsn: Option[String] = configuration.getOptional[String]("sentry.dsn").filterNot(_.isEmpty)
 
-  val thumbOrigin: String = properties("origin.thumb")
-  val fullOrigin: String = properties("origin.full")
-  val cropOrigin: String = properties("origin.crops")
-  val imageOrigin: String = properties("origin.images")
-  val googleTrackingId: Option[String] = properties.get("google.tracking.id").filterNot(_.isEmpty)
+  val thumbOrigin: String = configuration.get[String]("origin.thumb")
+  val fullOrigin: String = configuration.get[String]("origin.full")
+  val cropOrigin: String = configuration.get[String]("origin.crops")
+  val imageOrigin: String = configuration.get[String]("origin.images")
+
+  val googleTrackingId: Option[String] = configuration.getOptional[String]("google.tracking.id").filterNot(_.isEmpty)
 }
