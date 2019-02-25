@@ -1,4 +1,4 @@
-import com.gu.mediaservice.lib.auth.GuardianEditorialPermissionsHandler
+import com.gu.mediaservice.lib.auth.{GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler}
 import com.gu.mediaservice.lib.aws.MessageSender
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.elasticsearch.ElasticSearchConfig
@@ -92,7 +92,16 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
 
   val imageResponse = new ImageResponse(config, imageBucket, thumbnailBucket, enabledUsageQuota, services)
 
-  val permissionsHandler = new GuardianEditorialPermissionsHandler(config)
+  val permissionsHandler = (for {
+    permissionsBucket <- config.permissionsBucket
+    permissionsStage <- config.permissionsStage
+  } yield {
+    new GuardianEditorialPermissionsHandler(permissionsBucket, permissionsStage, config)
+  }).getOrElse{
+    Logger.warn("No permissions handler is configured; granting all permissions to all users.")
+    new GrantAllPermissionsHandler()
+  }
+
   val mediaApi = new MediaApi(auth, messageSender, elasticSearch, imageResponse, config, controllerComponents, imageBucket,
     mediaApiMetrics, services, permissionsHandler)
   val suggestionController = new SuggestionController(auth, elasticSearch, controllerComponents)

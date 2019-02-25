@@ -9,13 +9,18 @@ trait PermissionsHandler {
   def hasPermission(user: Principal, permission: PermissionDefinition): Boolean
 }
 
-class GuardianEditorialPermissionsHandler(config: CommonConfig) extends PermissionsHandler {
+class GrantAllPermissionsHandler extends PermissionsHandler {
+  override def storeIsEmpty: Boolean = false
+  override def hasPermission(user: Principal, permission: PermissionDefinition): Boolean = true
+}
+
+class GuardianEditorialPermissionsHandler(bucket: String, stage: String, config: CommonConfig) extends PermissionsHandler {
 
   private val permissionsConfig = PermissionsConfig(
-    stage = config.permissionsStage,
+    stage = stage,
     region = config.awsRegion,
     awsCredentials = config.awsCredentials,
-    s3Bucket = config.permissionsBucket
+    s3Bucket = bucket
   )
 
   private val permissions = PermissionsProvider(permissionsConfig)
