@@ -187,13 +187,14 @@ class UsageStore(
 class QuotaStore(
   quotaFile: String,
   bucket: String,
-  config: MediaApiConfig
+  config: MediaApiConfig,
+  quotaUpdateEnabled: Boolean
 )(implicit ec: ExecutionContext) extends BaseStore[String, SupplierUsageQuota](bucket, config)(ec) {
 
   def getQuota: Future[Map[String, SupplierUsageQuota]] = Future.successful(store.get())
 
   def update() {
-    if (config.quotaUpdateEnabled) {
+    if (quotaUpdateEnabled) {
       store.send(_ => fetchQuota)
     } else {
       GridLogger.info("Quota store updates disabled. Set quota.update.enabled in media-api.properties to enable.")

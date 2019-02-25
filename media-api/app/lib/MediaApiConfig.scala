@@ -10,13 +10,10 @@ class MediaApiConfig(override val configuration: Configuration) extends CommonCo
 
   final override lazy val appName = "media-api"
 
-  lazy val usageStoreBucket: String = properties("s3.usagemail.bucket")
-
-  lazy val quotaStoreBucket: String = properties("s3.config.bucket")
-  lazy val quotaStoreFile: String = properties("quota.store.key")
-
-  // quota updates can only be turned off in DEV
-  lazy val quotaUpdateEnabled: Boolean = if (isDev) properties.getOrElse("quota.update.enabled", "false").toBoolean else true
+  lazy val usageStoreBucket: Option[String] = configuration.getOptional[String]("s3.usagemail.bucket")
+  lazy val quotaStoreBucket: Option[String] = configuration.getOptional[String]("s3.config.bucket")
+  lazy val quotaStoreFile: Option[String] = configuration.getOptional[String]("quota.store.key")
+  lazy val quotaUpdateEnabled: Option[Boolean] = configuration.getOptional[Boolean]("quota.update.enabled")
 
   private lazy val ec2Client: AmazonEC2 = withAWSCredentials(AmazonEC2ClientBuilder.standard()).build()
 
