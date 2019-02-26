@@ -1,6 +1,5 @@
 package lib
 
-import com.amazonaws.regions.{Region, RegionUtils}
 import com.gu.mediaservice.lib.config.CommonConfig
 import play.api.Configuration
 
@@ -8,14 +7,12 @@ class EditsConfig(override val configuration: Configuration) extends CommonConfi
 
   final override lazy val appName = "metadata-editor"
 
-  val dynamoRegion: Region = RegionUtils.getRegion(properties("aws.region"))
+  val keyStoreBucket: String = configuration.get[String]("auth.keystore.bucket")
 
-  val keyStoreBucket = properties("auth.keystore.bucket")
-  val collectionsBucket: String = properties("s3.collections.bucket")
+  val editsTable: String = configuration.get[String]("dynamo.table.edits")
 
-  val editsTable = properties("dynamo.table.edits")
+  val topicArn: String = configuration.get[String]("sns.topic.arn")
 
-  val topicArn = properties("sns.topic.arn")
-  val queueUrl = properties("indexed.images.sqs.queue.url")
+  val queueUrl: String = configuration.get[String]("indexed.images.sqs.queue.url")
 
 }
