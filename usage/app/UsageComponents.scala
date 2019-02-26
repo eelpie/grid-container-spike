@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.aws.MessageSenderVersion
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
 import controllers.UsageApi
@@ -5,6 +6,7 @@ import lib._
 import model._
 import play.api.ApplicationLoader.Context
 import router.Routes
+import com.gu.mediaservice.lib.aws.SNS
 
 import scala.concurrent.Future
 
@@ -16,6 +18,10 @@ class UsageComponents(context: Context) extends GridComponents(context) {
   // Note: had to make these lazy to avoid init order problems
   lazy val services = new Services(config)
 
+  val publishers: Seq[MessageSenderVersion] = Seq(
+    new SNS(config, config.topicArn)
+  )
+
   val usageMetadataBuilder = new UsageMetadataBuilder(config)
   val mediaWrapper = new MediaWrapperOps(usageMetadataBuilder)
   val mediaUsage = new MediaUsageOps(usageMetadataBuilder)
@@ -23,10 +29,10 @@ class UsageComponents(context: Context) extends GridComponents(context) {
   val usageGroup = new UsageGroupOps(config, mediaUsage, liveContentApi, mediaWrapper, services)
   val usageTable = new UsageTable(config, mediaUsage)
   val usageMetrics = new UsageMetrics(config)
-  val usageNotifier = new UsageNotifier(config, usageTable)
+  val usageNotifier = new UsageNotifier(publishers, usageTable)
   val usageStream = new UsageStream(usageGroup)
   val usageRecorder = new UsageRecorder(usageMetrics, usageTable, usageStream, usageNotifier, usageNotifier)
-  val notifications = new Notifications(config)
+  val notifications = new Notifications(publishers)
 
   if(!config.apiOnly) {
     val crierReader = new CrierStreamReader(config)

@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.aws.{MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
 import controllers.{CollectionsController, ImageCollectionsController}
@@ -11,9 +12,13 @@ class CollectionsComponents(context: Context) extends GridComponents(context) {
 
   val services = new Services(config)
 
+  val publishers: Seq[MessageSenderVersion] = Seq(
+    new SNS(config, config.topicArn)
+  )
+
   val store = new CollectionsStore(config)
   val metrics = new CollectionsMetrics(config)
-  val notifications = new Notifications(config)
+  val notifications = new Notifications(publishers)
 
   val collections = new CollectionsController(auth, config, store, controllerComponents, services)
   val imageCollections = new ImageCollectionsController(auth, config, notifications, controllerComponents)

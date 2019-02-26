@@ -1,4 +1,5 @@
 import com.gu.mediaservice.lib.auth.{GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler}
+import com.gu.mediaservice.lib.aws.{MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.imaging.ImageOperations
 import com.gu.mediaservice.lib.management.ManagementWithPermissions
@@ -17,8 +18,12 @@ class CropperComponents(context: Context) extends GridComponents(context) {
   val store = new CropStore(config)
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
+  val publishers: Seq[MessageSenderVersion] = Seq(
+    new SNS(config, config.topicArn)
+  )
+
   val crops = new Crops(config, store, imageOperations)
-  val notifications = new Notifications(config)
+  val notifications = new Notifications(publishers)
 
   val permissionsHandler = (for {
     permissionsBucket <- config.permissionsBucket

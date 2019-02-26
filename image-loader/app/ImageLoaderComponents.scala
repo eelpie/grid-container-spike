@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.aws.{MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.imaging.ImageOperations
 import com.gu.mediaservice.lib.play.GridComponents
@@ -15,7 +16,11 @@ class ImageLoaderComponents(context: Context) extends GridComponents(context) {
   val store = new ImageLoaderStore(config)
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
-  val notifications = new Notifications(config)
+  val publishers: Seq[MessageSenderVersion] = Seq(
+    new SNS(config, config.topicArn)
+  )
+
+  val notifications = new Notifications(publishers)
   val downloader = new Downloader()
   val optimisedPngOps = new OptimisedPngOps(store, config)
   val imageUploadOps = new ImageUploadOps(store, config, imageOperations, optimisedPngOps)

@@ -1,5 +1,5 @@
 package lib
 
-import com.gu.mediaservice.lib.aws.MessageSender
+import com.gu.mediaservice.lib.aws.{MessageSender, MessageSenderVersion}
 
-class Notifications(config: CollectionsConfig) extends MessageSender(config, config.topicArn)
+class Notifications(publishers: Seq[MessageSenderVersion]) extends MessageSender(publishers)

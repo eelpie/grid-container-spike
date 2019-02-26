@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.aws.{MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
 import controllers.MediaLeaseController
@@ -9,8 +10,12 @@ class LeasesComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new LeasesConfig(configuration)
   val services = new Services(config)
 
+  val publishers: Seq[MessageSenderVersion] = Seq(
+    new SNS(config, config.topicArn)
+  )
+
   val store = new LeaseStore(config)
-  val notifications = new LeaseNotifier(config, store)
+  val notifications = new LeaseNotifier(publishers, store)
 
   val controller = new MediaLeaseController(auth, store, config, notifications, controllerComponents, services)
   override lazy val router = new Routes(httpErrorHandler, controller, management)

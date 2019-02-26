@@ -7,8 +7,6 @@ import com.gu.mediaservice.model.usage.UsageNotice
 import play.api.Logger
 import play.api.libs.json.{JodaWrites, Json}
 
-
-
 class SNS(config: CommonConfig, topicArn: String) extends MessageSenderVersion {
   lazy val client: AmazonSNS = config.withAWSCredentials(AmazonSNSClientBuilder.standard()).build()
 

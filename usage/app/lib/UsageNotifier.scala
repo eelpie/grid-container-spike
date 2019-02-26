@@ -1,6 +1,6 @@
 package lib
 
-import com.gu.mediaservice.lib.aws.{MessageSender, UpdateMessage}
+import com.gu.mediaservice.lib.aws.{MessageSender, MessageSenderVersion, UpdateMessage}
 import com.gu.mediaservice.model.usage.UsageNotice
 import model.{MediaUsage, UsageTable}
 import org.joda.time.DateTime
@@ -10,7 +10,7 @@ import rx.lang.scala.Observable
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UsageNotifier(config: UsageConfig, usageTable: UsageTable) extends MessageSender(config, config.topicArn) {
+class UsageNotifier(publishers: Seq[MessageSenderVersion], usageTable: UsageTable) extends MessageSender(publishers) {
   def build(mediaId: String) = Observable.from(
     usageTable.queryByImageId(mediaId).map((usages: Set[MediaUsage]) => {
       val usageJson = Json.toJson(usages.map(UsageBuilder.build)).as[JsArray]

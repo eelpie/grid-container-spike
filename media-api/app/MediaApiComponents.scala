@@ -1,5 +1,5 @@
 import com.gu.mediaservice.lib.auth.{GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler}
-import com.gu.mediaservice.lib.aws.MessageSender
+import com.gu.mediaservice.lib.aws.{MessageSender, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.elasticsearch.ElasticSearchConfig
 import com.gu.mediaservice.lib.elasticsearch6.ElasticSearch6Config
@@ -20,7 +20,11 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
 
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
-  val messageSender = new MessageSender(config, config.topicArn)
+  val publishers: Seq[MessageSenderVersion] = Seq(
+    new SNS(config, config.topicArn)
+  )
+
+  val messageSender = new MessageSender(publishers)
   val mediaApiMetrics = new MediaApiMetrics(config)
 
   val es1Config: Option[ElasticSearchConfig] = for {

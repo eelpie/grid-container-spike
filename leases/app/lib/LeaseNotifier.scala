@@ -1,6 +1,6 @@
 package lib
 
-import com.gu.mediaservice.lib.aws.{MessageSender, UpdateMessage}
+import com.gu.mediaservice.lib.aws.{MessageSender, MessageSenderVersion, UpdateMessage}
 import com.gu.mediaservice.lib.formatting._
 import com.gu.mediaservice.model.{LeasesByMedia, MediaLease}
 import org.joda.time.DateTime
@@ -31,15 +31,14 @@ object LeaseNotice {
   )
 }
 
-class LeaseNotifier(config: LeasesConfig, store: LeaseStore) extends MessageSender(config, config.topicArn) {
+class LeaseNotifier(publishers: Seq[MessageSenderVersion], store: LeaseStore) extends MessageSender(publishers) {
   private def build(mediaId: String, leases: List[MediaLease] ): LeaseNotice = {
     LeaseNotice(mediaId, Json.toJson(LeasesByMedia.build(leases)))
   }
 
   def sendReindexLeases(mediaId: String) = {
-    val replaceImageLeases = "replace-image-leases"
     val leases = store.getForMedia(mediaId)
-    publish(UpdateMessage(subject = replaceImageLeases, leases = Some(leases)))
+    publish(UpdateMessage(subject = "replace-image-leases", leases = Some(leases)))
   }
 
   def sendAddLease(mediaLease: MediaLease) = {
@@ -48,11 +47,6 @@ class LeaseNotifier(config: LeasesConfig, store: LeaseStore) extends MessageSend
   }
 
   def sendRemoveLease(mediaId: String, leaseId: String) = {
-    val leaseInfo = Json.obj(
-      "leaseId" -> leaseId,
-      "id" -> mediaId,
-      "lastModified" -> printDateTime(DateTime.now())
-    )
     val updateMessage = UpdateMessage(subject = "remove-image-lease", id = Some(mediaId),
       leaseId = Some(leaseId), lastModified = Some(DateTime.now())
     )

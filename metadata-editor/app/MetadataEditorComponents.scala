@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.aws.{MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.imaging.ImageOperations
 import com.gu.mediaservice.lib.play.GridComponents
@@ -10,8 +11,12 @@ class MetadataEditorComponents(context: Context) extends GridComponents(context)
   final override lazy val config = new EditsConfig(configuration)
   lazy val services = new Services(config)
 
+  val publishers: Seq[MessageSenderVersion] = Seq(
+    new SNS(config, config.topicArn)
+  )
+
   val store = new EditsStore(config)
-  val notifications = new Notifications(config)
+  val notifications = new Notifications(publishers)
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
   val metrics = new MetadataEditorMetrics(config)
