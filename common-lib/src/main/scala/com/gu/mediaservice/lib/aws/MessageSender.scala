@@ -1,19 +1,12 @@
 package com.gu.mediaservice.lib.aws
 
-import com.gu.mediaservice.lib.config.CommonConfig
 import com.gu.mediaservice.model._
 import com.gu.mediaservice.model.usage.UsageNotice
 import org.joda.time.DateTime
-import play.api.libs.json.JsValue
 
-// TODO MRB: replace this with the simple Kinesis class once we migrate off SNS
-class MessageSender(config: CommonConfig, snsTopicArn: String) {
-  private val sns = new SNS(config, snsTopicArn)
-  // private val kinesis = new Kinesis(config, config.thrallKinesisStream)
-
+class MessageSender(publishers: Seq[MessageSenderVersion]) {
   def publish(updateMessage: UpdateMessage): Unit = {
-    sns.publish(updateMessage)
-    // TODO feature toggle kinesis.publish(updateMessage)
+    publishers.map(_.publish(updateMessage))
   }
 }
 
