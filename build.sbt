@@ -81,7 +81,10 @@ lazy val imageLoader = playProject("image-loader", 9003).settings {
       ExecCmd("RUN", "apt-get", "update"),
       ExecCmd("RUN", "apt-get", "upgrade", "-y"),
       ExecCmd("RUN", "apt-get", "install", "-t", "jessie-backports", "-y", "openjdk-8-jre"),
-      ExecCmd("RUN", "apt-get", "install", "-y", "graphicsmagick")
+      ExecCmd("RUN", "apt-get", "install", "-y", "graphicsmagick"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "graphicsmagick-imagemagick-compat"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "pngquant"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "libimage-exiftool-perl")
     )
   )
 }
