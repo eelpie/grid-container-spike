@@ -1,7 +1,7 @@
 package lib
 
 import com.gu.mediaservice.lib.ImageId
-import com.gu.mediaservice.lib.aws.EsResponse
+import com.gu.mediaservice.lib.aws.{EsResponse, UpdateMessage}
 import com.gu.mediaservice.lib.logging.GridLogger
 import com.gu.mediaservice.model.{Edits, SyndicationRights}
 import play.api.libs.json.{JsError, JsValue, Json, Reads}
@@ -79,7 +79,10 @@ class MessageProcessor(es: ElasticSearchVersion,
               store.deleteOriginal(id)
               store.deleteThumbnail(id)
               store.deletePng(id)
-              metadataNotifications.publish(Json.obj("id" -> id), "image-deleted")
+
+              val updateMessage = UpdateMessage(subject = "image-deleted", id = Some(id))
+              metadataNotifications.publish(updateMessage)
+
               EsResponse(s"Image deleted: $id")
           } recoverWith {
             case ImageNotDeletable =>

@@ -39,27 +39,23 @@ class LeaseNotifier(config: LeasesConfig, store: LeaseStore) extends MessageSend
   def sendReindexLeases(mediaId: String) = {
     val replaceImageLeases = "replace-image-leases"
     val leases = store.getForMedia(mediaId)
-    val updateMessage = UpdateMessage(subject = replaceImageLeases, leases = Some(leases) )
-    publish(build(mediaId, leases).toJson, replaceImageLeases, updateMessage)
+    publish(UpdateMessage(subject = replaceImageLeases, leases = Some(leases)))
   }
 
   def sendAddLease(mediaLease: MediaLease) = {
-    val addImageLease = "add-image-lease"
-    val updateMessage = UpdateMessage(subject = addImageLease, mediaLease = Some(mediaLease), id = Some(mediaLease.mediaId), lastModified = Some(DateTime.now()))
-    publish(MediaLease.toJson(mediaLease), addImageLease, updateMessage)
+    val updateMessage = UpdateMessage(subject = "add-image-lease", mediaLease = Some(mediaLease), id = Some(mediaLease.mediaId), lastModified = Some(DateTime.now()))
+    publish(updateMessage)
   }
 
   def sendRemoveLease(mediaId: String, leaseId: String) = {
-    val removeImageLease = "remove-image-lease"
-
     val leaseInfo = Json.obj(
       "leaseId" -> leaseId,
       "id" -> mediaId,
       "lastModified" -> printDateTime(DateTime.now())
     )
-    val updateMessage = UpdateMessage(subject = removeImageLease, id = Some(mediaId),
+    val updateMessage = UpdateMessage(subject = "remove-image-lease", id = Some(mediaId),
       leaseId = Some(leaseId), lastModified = Some(DateTime.now())
     )
-    publish(leaseInfo, removeImageLease, updateMessage)
+    publish(updateMessage)
   }
 }

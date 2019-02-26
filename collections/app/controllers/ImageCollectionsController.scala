@@ -15,7 +15,6 @@ import play.api.mvc.{BaseController, ControllerComponents}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 class ImageCollectionsController(authenticated: Authentication, config: CollectionsConfig, notifications: Notifications,
                                  override val controllerComponents: ControllerComponents)
   extends BaseController with ArgoHelpers {
@@ -40,7 +39,6 @@ class ImageCollectionsController(authenticated: Authentication, config: Collecti
         .map(cols => respond(collection))
     } getOrElse Future.successful(respondError(BadRequest, "invalid-form-data", "Invalid form data"))
   }
-
 
   def removeCollection(id: String, collectionString: String) = authenticated.async { req =>
     val path = CollectionsManager.uriToPath(UriOps.encodePlus(collectionString))
@@ -69,7 +67,7 @@ class ImageCollectionsController(authenticated: Authentication, config: Collecti
     )
 
     val updateMessage = UpdateMessage(subject = "set-image-collections", collections = Some(collections))
-    notifications.publish(message, "set-image-collections", updateMessage)
+    notifications.publish(updateMessage)
     onlyLatestCollections
   }
 }

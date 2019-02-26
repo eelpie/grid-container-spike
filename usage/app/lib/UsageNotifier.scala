@@ -20,6 +20,6 @@ class UsageNotifier(config: UsageConfig, usageTable: UsageTable) extends Message
   def send(usageNotice: UsageNotice) = {
     Logger.info(s"Sending usage notice for ${usageNotice.mediaId}")
     val updateMessage = UpdateMessage(subject = "update-image-usages", id = Some(usageNotice.mediaId), usageNotice = Some(usageNotice), lastModified = Some(DateTime.now()))
-    publish(usageNotice.toJson, "update-image-usages", updateMessage)
+    publish(updateMessage)
   }
 }

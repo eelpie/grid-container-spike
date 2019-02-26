@@ -129,7 +129,10 @@ class MessageProcessor(es: ElasticSearchVersion,
               store.deleteOriginal(id)
               store.deleteThumbnail(id)
               store.deletePng(id)
-              metadataNotifications.publish(Json.obj("id" -> id), "image-deleted")
+
+              val updateMessage = UpdateMessage(subject = "image-deleted", id = Some(id))
+              metadataNotifications.publish(updateMessage)
+
               EsResponse(s"Image deleted: $id")
           } recoverWith {
             case ImageNotDeletable =>

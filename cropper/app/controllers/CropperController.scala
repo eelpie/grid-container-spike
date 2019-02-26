@@ -56,9 +56,8 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
           "data" -> Json.arr(cropJson)
         )
 
-        val updateImageExports = "update-image-exports"
-        val updateMessage = UpdateMessage(subject = updateImageExports, id = Some(imageId), crops = Some(Seq(export)))
-        notifications.publish(exports, updateImageExports, updateMessage)
+        val updateMessage = UpdateMessage(subject = "update-image-exports", id = Some(imageId), crops = Some(Seq(export)))
+        notifications.publish(updateMessage)
 
         Ok(cropJson).as(ArgoMediaType)
 
@@ -108,7 +107,7 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
     if(canDeleteCrops) {
       store.deleteCrops(id).map { _ =>
         val updateMessage = UpdateMessage(subject = "delete-image-exports", id = Some(id))
-        notifications.publish(Json.obj("id" -> id), "delete-image-exports", updateMessage)
+        notifications.publish(updateMessage)
         Accepted
       } recover {
         case _ => respondError(BadRequest, "deletion-error", "Could not delete crops")

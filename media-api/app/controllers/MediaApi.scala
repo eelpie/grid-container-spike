@@ -188,9 +188,8 @@ class MediaApi(
           val canDelete = canUserDeleteImage(request, image)
 
           if (canDelete) {
-            val deleteImage = "delete-image"
-            val updateMessage = UpdateMessage(subject = deleteImage, id = Some(id))
-            messageSender.publish(Json.obj("id" -> id), deleteImage, updateMessage)
+            val updateMessage = UpdateMessage(subject = "delete-image", id = Some(id))
+            messageSender.publish(updateMessage)
             Accepted
           } else {
             ImageDeleteForbidden
@@ -246,9 +245,8 @@ class MediaApi(
 
           val notification = Json.toJson(finalImage)
 
-          val updateImage = "update-image"
-          val updateMessage = UpdateMessage(subject = updateImage, id = Some(finalImage.id), image = Some(finalImage))
-          messageSender.publish(notification, updateImage, updateMessage)
+          val updateMessage = UpdateMessage(subject = "update-image", id = Some(finalImage.id), image = Some(finalImage))
+          messageSender.publish(updateMessage)
 
           Ok(Json.obj(
             "id" -> id,

@@ -10,13 +10,13 @@ import com.gu.mediaservice.model.usage.UsageNotice
 import play.api.Logger
 import play.api.libs.json.{JodaWrites, Json}
 
-class Kinesis(config: CommonConfig, streamName: String) {
+class Kinesis(config: CommonConfig, streamName: String) extends MessageSenderVersion {
   lazy val client: AmazonKinesis = config.withAWSCredentials(AmazonKinesisClientBuilder.standard()).build()
 
   def publish(message: UpdateMessage) {
     val partitionKey = UUID.randomUUID().toString
 
-    implicit val yourJodaDateWrites = JodaWrites.JodaDateTimeWrites
+    implicit val jodaDateTimeWrites = JodaWrites.JodaDateTimeWrites
     implicit val unw = Json.writes[UsageNotice]
     implicit val umw = Json.writes[UpdateMessage]
 
@@ -32,4 +32,5 @@ class Kinesis(config: CommonConfig, streamName: String) {
     val result = client.putRecord(request)
     Logger.info(s"Published kinesis message: $result")
   }
+
 }

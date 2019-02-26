@@ -8,12 +8,11 @@ import play.api.libs.json.JsValue
 
 // TODO MRB: replace this with the simple Kinesis class once we migrate off SNS
 class MessageSender(config: CommonConfig, snsTopicArn: String) {
-  private val legacySns = new SNS(config, snsTopicArn)
+  private val sns = new SNS(config, snsTopicArn)
   // private val kinesis = new Kinesis(config, config.thrallKinesisStream)
 
-  // TODO deprecate the message JsValue input in favour of the more structured update message
-  def publish(message: JsValue, subject: String, updateMessage: UpdateMessage): Unit = {
-    legacySns.publish(message, subject)
+  def publish(updateMessage: UpdateMessage): Unit = {
+    sns.publish(updateMessage)
     // TODO feature toggle kinesis.publish(updateMessage)
   }
 }

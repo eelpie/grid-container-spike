@@ -225,7 +225,7 @@ class EditsController(auth: Authentication, store: EditsStore, notifications: No
     )
 
     val updateMessage = UpdateMessage(subject = subject, id = Some(id), edits = Some(edits), lastModified = Some(new DateTime()))
-    notifications.publish(message, subject, updateMessage)
+    notifications.publish(updateMessage)
     edits
   }
 
