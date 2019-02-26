@@ -72,8 +72,17 @@ lazy val collections = playProject("collections", 9010)
 lazy val cropper = playProject("cropper", 9006)
 
 lazy val imageLoader = playProject("image-loader", 9003).settings {
-  libraryDependencies ++= Seq(
-    "com.squareup.okhttp3" % "okhttp" % "3.12.1"
+  import com.typesafe.sbt.packager.docker._
+  Seq(
+    libraryDependencies ++= Seq("com.squareup.okhttp3" % "okhttp" % "3.12.1"),
+    dockerBaseImage := "debian:jessie-backports",
+    dockerCommands ++= Seq(
+      Cmd("USER", "root"),
+      ExecCmd("RUN", "apt-get", "update"),
+      ExecCmd("RUN", "apt-get", "upgrade", "-y"),
+      ExecCmd("RUN", "apt-get", "install", "-t", "jessie-backports", "-y", "openjdk-8-jre"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "graphicsmagick")
+    )
   )
 }
 
