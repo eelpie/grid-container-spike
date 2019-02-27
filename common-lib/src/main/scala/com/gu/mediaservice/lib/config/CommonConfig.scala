@@ -50,7 +50,7 @@ trait CommonConfig {
   val isProd: Boolean = stage == "PROD"
   val isDev: Boolean = stage == "DEV"
 
-  final val thrallKinesisStream: Option[String] = Some(s"$stackName-thrall-$stage")
+  final val thrallKinesisStream: Option[String] = None // Some(s"$stackName-thrall-$stage")
 
   val loggerKinesisStream = configuration.get[String]("logger.kinesis.stream")
   val loggerKinesisRegion = configuration.get[String]("logger.kinesis.region")

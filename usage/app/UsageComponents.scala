@@ -1,4 +1,4 @@
-import com.gu.mediaservice.lib.aws.MessageSenderVersion
+import com.gu.mediaservice.lib.aws.{Kinesis, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
 import controllers.UsageApi
@@ -6,7 +6,6 @@ import lib._
 import model._
 import play.api.ApplicationLoader.Context
 import router.Routes
-import com.gu.mediaservice.lib.aws.SNS
 
 import scala.concurrent.Future
 
@@ -19,7 +18,8 @@ class UsageComponents(context: Context) extends GridComponents(context) {
   lazy val services = new Services(config)
 
   val publishers: Seq[MessageSenderVersion] = Seq(
-    config.topicArn.map(topicArn => new SNS(config, topicArn))
+    config.topicArn.map(topicArn => new SNS(config, topicArn)),
+    config.thrallKinesisStream.map(kinesisStreamName => new Kinesis(config, kinesisStreamName))
   ).flatten
 
   val usageMetadataBuilder = new UsageMetadataBuilder(config)

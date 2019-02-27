@@ -1,5 +1,5 @@
 import com.gu.mediaservice.lib.auth.{GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler}
-import com.gu.mediaservice.lib.aws.{MessageSender, MessageSenderVersion, SNS}
+import com.gu.mediaservice.lib.aws.{Kinesis, MessageSender, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.elasticsearch.ElasticSearchConfig
 import com.gu.mediaservice.lib.elasticsearch6.ElasticSearch6Config
@@ -21,7 +21,8 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
   val publishers: Seq[MessageSenderVersion] = Seq(
-    config.topicArn.map(topicArn => new SNS(config, topicArn))
+    config.topicArn.map(topicArn => new SNS(config, topicArn)),
+    config.thrallKinesisStream.map(kinesisStreamName => new Kinesis(config, kinesisStreamName))
   ).flatten
 
   val messageSender = new MessageSender(publishers)

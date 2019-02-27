@@ -1,5 +1,5 @@
 import com.gu.mediaservice.lib.auth.{GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler}
-import com.gu.mediaservice.lib.aws.{MessageSenderVersion, SNS}
+import com.gu.mediaservice.lib.aws.{Kinesis, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.imaging.ImageOperations
 import com.gu.mediaservice.lib.management.ManagementWithPermissions
@@ -19,7 +19,8 @@ class CropperComponents(context: Context) extends GridComponents(context) {
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
   val publishers: Seq[MessageSenderVersion] = Seq(
-    config.topicArn.map(topicArn => new SNS(config, topicArn))
+    config.topicArn.map(topicArn => new SNS(config, topicArn)),
+    config.thrallKinesisStream.map(kinesisStreamName => new Kinesis(config, kinesisStreamName))
   ).flatten
 
   val crops = new Crops(config, store, imageOperations)
