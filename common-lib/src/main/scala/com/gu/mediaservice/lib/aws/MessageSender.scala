@@ -3,10 +3,14 @@ package com.gu.mediaservice.lib.aws
 import com.gu.mediaservice.model._
 import com.gu.mediaservice.model.usage.UsageNotice
 import org.joda.time.DateTime
+import play.api.Logger
 
 class MessageSender(publishers: Seq[MessageSenderVersion]) {
   def publish(updateMessage: UpdateMessage): Unit = {
-    publishers.map(_.publish(updateMessage))
+    publishers.map { publisher =>
+      Logger.info("Publishing message to publisher " + publisher.toString + ": " + updateMessage)
+      publisher.publish(updateMessage)
+    }
   }
 }
 

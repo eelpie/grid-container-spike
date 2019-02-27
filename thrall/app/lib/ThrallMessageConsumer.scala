@@ -1,8 +1,8 @@
 package lib
 
-import com.gu.mediaservice.lib.aws.MessageConsumer
+import com.gu.mediaservice.lib.aws.{MessageConsumer, UpdateMessage}
+import lib.kinesis.MessageProcessor
 import org.joda.time.DateTime
-import play.api.libs.json.JsValue
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -22,8 +22,8 @@ class ThrallMessageConsumer(
 
   val messageProcessor = new MessageProcessor(es, store, metadataNotifications, syndicationRightsOps)
 
-  override def chooseProcessor(subject: String): Option[JsValue => Future[Any]] = {
-    messageProcessor.chooseProcessor(subject)
+  override def chooseProcessor(message: UpdateMessage): Option[UpdateMessage => Future[Any]] = {
+    messageProcessor.chooseProcessor(message)
   }
 
   override def isStopped: Boolean = {

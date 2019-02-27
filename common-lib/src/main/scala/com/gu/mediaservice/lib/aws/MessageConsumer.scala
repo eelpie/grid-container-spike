@@ -9,12 +9,13 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.model.Dimension
 import com.amazonaws.services.sqs.model.{DeleteMessageRequest, ReceiveMessageRequest, Message => SQSMessage}
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSClientBuilder}
-import com.gu.mediaservice.lib.ImageId
 import com.gu.mediaservice.lib.config.CommonConfig
 import com.gu.mediaservice.lib.json.PlayJsonHelpers._
 import com.gu.mediaservice.lib.metrics.Metric
+import com.gu.mediaservice.model.usage.UsageNotice
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
+import play.api.Logger
 import scalaz.syntax.id._
 
 import scala.annotation.tailrec
@@ -22,7 +23,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class MessageConsumer(queueUrl: String, awsEndpoint: String, config: CommonConfig, metric: Metric[Long]) extends ImageId {
+abstract class MessageConsumer(queueUrl: String, awsEndpoint: String, config: CommonConfig, metric: Metric[Long]) {
   val actorSystem = ActorSystem("MessageConsumer")
 
   private implicit val ctx: ExecutionContext =
@@ -33,7 +34,7 @@ abstract class MessageConsumer(queueUrl: String, awsEndpoint: String, config: Co
 
   lazy val client: AmazonSQS = config.withAWSCredentials(AmazonSQSClientBuilder.standard()).build()
 
-  def chooseProcessor(subject: String): Option[JsValue => Future[Any]]
+  def chooseProcessor(message: UpdateMessage): Option[UpdateMessage => Future[Any]]
 
   val timeMessageLastProcessed = new AtomicReference[DateTime](DateTime.now)
 
@@ -42,13 +43,24 @@ abstract class MessageConsumer(queueUrl: String, awsEndpoint: String, config: Co
     // Pull 1 message at a time to avoid starvation
     // Wait for maximum duration (20s) as per doc recommendation:
     // http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-long-polling.html
+
+    implicit val yourJodaDateReads = JodaReads.DefaultJodaDateTimeReads
+    implicit val unr = Json.reads[UsageNotice]
+    implicit val umr = Json.reads[UpdateMessage]
+
     for (msg <- getMessages(waitTime = 20, maxMessages = 1)) {
+      Logger.debug("Processing message: " + msg)
       val future = for {
-        message <- Future(extractSNSMessage(msg) getOrElse sys.error("Invalid message structure (not via SNS?)"))
-        processor = message.subject.flatMap(chooseProcessor)
+        snsMessage <- Future(extractSNSMessage(msg) getOrElse {
+          val errorMessage = "Invalid message structure (not via SNS?)"
+          Logger.error(errorMessage)
+          sys.error(errorMessage)
+        })
+        message = snsMessage.body.as[UpdateMessage] // TODO validation
+        processor = chooseProcessor(message)
         _ <- processor.fold(
           sys.error(s"Unrecognised message subject ${message.subject}"))(
-            _.apply(message.body))
+            _.apply(message))
         _ = recordMessageCount(message)
         _ = timeMessageLastProcessed.lazySet(DateTime.now)
       } yield ()
@@ -58,27 +70,25 @@ abstract class MessageConsumer(queueUrl: String, awsEndpoint: String, config: Co
     processMessages()
   }
 
-  private def recordMessageCount(message: SNSMessage) = {
-    val dimensions = message.subject match {
-      case Some(subject) => List(new Dimension().withName("subject").withValue(subject))
-      case None          => List()
-    }
-    metric.runRecordOne(1L, dimensions)
+  private def recordMessageCount(message: UpdateMessage) = {
+    metric.runRecordOne(1L, List(new Dimension().withName("subject").withValue(message.subject)))
   }
 
   private def deleteOnSuccess(msg: SQSMessage)(f: Future[Any]): Unit =
     f.foreach { _ => deleteMessage(msg) }
 
-  private def getMessages(waitTime: Int, maxMessages: Int): Seq[SQSMessage] =
+  private def getMessages(waitTime: Int, maxMessages: Int): Seq[SQSMessage] = {
+    Logger.info("Getting messages from queue URL: " + queueUrl)
     client.receiveMessage(
       new ReceiveMessageRequest(queueUrl)
         .withWaitTimeSeconds(waitTime)
         .withMaxNumberOfMessages(maxMessages)
     ).getMessages.asScala.toList
+  }
 
-  private def extractSNSMessage(sqsMessage: SQSMessage): Option[SNSMessage] =
+  private def extractSNSMessage(sqsMessage: SQSMessage): Option[SNSMessage] = {
     Json.fromJson[SNSMessage](Json.parse(sqsMessage.getBody)) <| logParseErrors |> (_.asOpt)
-
+  }
   private def deleteMessage(message: SQSMessage): Unit =
     client.deleteMessage(new DeleteMessageRequest(queueUrl, message.getReceiptHandle))
 }
@@ -108,5 +118,5 @@ object SNSMessage {
         (__ \ "Subject").readNullable[String] ~
         (__ \ "Timestamp").read[String].map(parseTimestamp) ~
         (__ \ "Message").read[String].map(Json.parse)
-      )(SNSMessage(_, _, _, _, _, _))
+      ) (SNSMessage(_, _, _, _, _, _))
 }
