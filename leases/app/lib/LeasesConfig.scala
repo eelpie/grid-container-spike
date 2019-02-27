@@ -1,7 +1,5 @@
 package lib
 
-import java.net.URI
-
 import com.gu.mediaservice.lib.config.CommonConfig
 import play.api.Configuration
 
@@ -11,8 +9,6 @@ class LeasesConfig(override val configuration: Configuration) extends CommonConf
 
   val topicArn = configuration.getOptional[String]("sns.topic.arn")
 
-  val leasesTable = properties("dynamo.tablename.leasesTable")
-
-  private def uri(u: String) = URI.create(u)
+  val leasesTable = configuration.get[String]("dynamo.tablename.leasesTable")
 
 }

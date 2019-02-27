@@ -8,7 +8,7 @@ import router.Routes
 
 class LeasesComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new LeasesConfig(configuration)
-  val services = new Services(config)
+  lazy val services = new Services(config)
 
   val publishers: Seq[MessageSenderVersion] = Seq(
     config.topicArn.map(topicArn => new SNS(config, topicArn)),
