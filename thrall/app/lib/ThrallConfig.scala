@@ -23,8 +23,6 @@ class ThrallConfig(override val configuration: Configuration) extends CommonConf
 
   lazy val queueUrl: String = configuration.get[String]("sqs.queue.url")
 
-  private lazy val ec2Client = withAWSCredentials(AmazonEC2ClientBuilder.standard()).build()
-
   lazy val imageBucket: String = configuration.get[String]("s3.image.bucket")
   lazy val thumbnailBucket: String = configuration.get[String]("s3.thumb.bucket")
 

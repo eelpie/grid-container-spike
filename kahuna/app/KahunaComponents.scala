@@ -3,7 +3,7 @@ import com.gu.mediaservice.lib.play.GridComponents
 import controllers.{AssetsComponents, KahunaController}
 import lib.KahunaConfig
 import play.api.ApplicationLoader.Context
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.filters.headers.SecurityHeadersConfig
 import router.Routes
 
@@ -37,8 +37,8 @@ object KahunaSecurityConfig {
     val frameSources = s"frame-src ${services.authBaseUri} ${services.kahunaBaseUri} https://accounts.google.com"
     val frameAncestors = s"frame-ancestors ${services.toolsDomains.map(domain => s"*.$domain").mkString(" ")}"
     val connectSources = s"connect-src ${(serviceUrls :+ config.imageOrigin).mkString(" ")} 'self' www.google-analytics.com"
-
     val imageSources = s"img-src data: blob: ${services.imgopsBaseUri} https://${config.fullOrigin} https://${config.thumbOrigin} ${config.cropOrigin} www.google-analytics.com 'self'"
+    Logger.info("Content security policy image sources: " + imageSources)
 
     base.copy(
       // covered by frame-ancestors in contentSecurityPolicy
