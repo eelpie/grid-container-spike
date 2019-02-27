@@ -49,9 +49,13 @@ trait CommonConfig {
 
   final val thrallKinesisStream: Option[String] = None // Some(s"$stackName-thrall-$stage")
 
-  val loggerKinesisStream = configuration.get[String]("logger.kinesis.stream")
-  val loggerKinesisRegion = configuration.get[String]("logger.kinesis.region")
-  val loggerKinesisRoleArn = configuration.get[String]("logger.kinesis.roleArn")
+  val kinesisLoggingConfiguration = for {
+     loggerKinesisStream <- configuration.getOptional[String]("logger.kinesis.stream")
+     loggerKinesisRegion <- configuration.getOptional[String]("logger.kinesis.region")
+     loggerKinesisRoleArn <- configuration.getOptional[String]("logger.kinesis.roleArn")
+  } yield {
+    KinesisLoggingConfiguration(loggerKinesisStream, loggerKinesisRegion, loggerKinesisRoleArn)
+  }
 
   val permissionsBucket = configuration.getOptional[String]("permissions.bucket")
   val permissionsStage = configuration.getOptional[String]("permissions.stage") // TODO Do not want
@@ -63,3 +67,6 @@ trait CommonConfig {
   }
 
 }
+
+case class KinesisLoggingConfiguration(stream: String, region: String, roleArn: String)
+

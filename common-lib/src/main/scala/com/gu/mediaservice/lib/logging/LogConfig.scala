@@ -3,13 +3,14 @@ package com.gu.mediaservice.lib.logging
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{LoggerContext, Logger => LogbackLogger}
 import com.gu.logback.appender.kinesis.KinesisAppender
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, KinesisLoggingConfiguration}
 import net.logstash.logback.layout.LogstashLayout
 import org.slf4j.{LoggerFactory, Logger => SLFLogger}
 import play.api.ApplicationLoader.Context
 import play.api.LoggerConfigurator
 import play.api.libs.json._
 import scalaz.syntax.id._
+
 import scala.util.Try
 
 object LogConfig {
@@ -34,43 +35,39 @@ object LogConfig {
       a.start()
   }
 
-  def initKinesisLogging(config: CommonConfig): Unit = {
+  def initKinesisLogging(config: CommonConfig, kinesisLoggingConfiguration: KinesisLoggingConfiguration): Unit = {
 
     def makeCustomFields(config: CommonConfig): String = {
       Json.toJson(Map(
         "stack" -> config.stackName,
         "stage" -> config.stage.toUpperCase,
-        "app"   -> config.appName,
+        "app" -> config.appName,
         "sessionId" -> config.sessionId
       )).toString()
     }
 
-    if (config.isDev) {
-      rootLogger.info("Kinesis logging disabled in DEV")
-    } else {
-      Try {
-        rootLogger.info("LogConfig initializing")
-        rootLogger.info("Configuring Logback")
+    Try {
+      rootLogger.info("LogConfig initializing")
+      rootLogger.info("Configuring Logback")
 
-        val customFields = makeCustomFields(config)
-        val context      = rootLogger.getLoggerContext
-        val layout       = makeLayout(customFields)
-        val bufferSize   = 1000
+      val customFields = makeCustomFields(config)
+      val context = rootLogger.getLoggerContext
+      val layout = makeLayout(customFields)
+      val bufferSize = 1000
 
-        val appender     = makeKinesisAppender(layout, context,
-          KinesisAppenderConfig(
-            config.loggerKinesisStream,
-            config.loggerKinesisRegion,
-            config.loggerKinesisRoleArn,
-            bufferSize
-          )
+      val appender = makeKinesisAppender(layout, context,
+        KinesisAppenderConfig(
+          kinesisLoggingConfiguration.stream,
+          kinesisLoggingConfiguration.region,
+          kinesisLoggingConfiguration.roleArn,
+          bufferSize
         )
+      )
+      rootLogger.addAppender(appender)
+      rootLogger.info("Configured Logback")
 
-        rootLogger.addAppender(appender)
-        rootLogger.info("Configured Logback")
-      } recover {
-        case e => rootLogger.error("LogConfig Failed!", e)
-      }
+    } recover {
+      case e => rootLogger.error("LogConfig Failed!", e)
     }
   }
 
