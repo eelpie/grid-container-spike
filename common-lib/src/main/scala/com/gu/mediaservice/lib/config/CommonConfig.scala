@@ -56,7 +56,7 @@ trait CommonConfig {
   val permissionsBucket = configuration.getOptional[String]("permissions.bucket")
   val permissionsStage = configuration.getOptional[String]("permissions.stage") // TODO Do not want
 
-  // TODO purge
+  // TODO purge - move to Play config
   private def stageFromFile: Option[String] = {
     val file = new File("/etc/gu/stage")
     if (file.exists) Some(fromFile(file).mkString.trim) else None

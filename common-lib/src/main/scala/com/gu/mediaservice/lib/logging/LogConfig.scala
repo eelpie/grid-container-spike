@@ -18,15 +18,6 @@ object LogConfig {
 
   case class KinesisAppenderConfig(stream: String, region: String, roleArn: String, bufferSize: Int)
 
-  def makeCustomFields(config: CommonConfig): String = {
-    Json.toJson(Map(
-      "stack" -> config.stackName,
-      "stage" -> config.stage.toUpperCase,
-      "app"   -> config.appName,
-      "sessionId" -> config.sessionId
-    )).toString()
-  }
-
   def makeLayout(customFields: String) = new LogstashLayout() <| (_.setCustomFields(customFields))
 
   def makeKinesisAppender(layout: LogstashLayout, context: LoggerContext, appenderConfig: KinesisAppenderConfig) =
@@ -44,6 +35,16 @@ object LogConfig {
   }
 
   def initKinesisLogging(config: CommonConfig): Unit = {
+
+    def makeCustomFields(config: CommonConfig): String = {
+      Json.toJson(Map(
+        "stack" -> config.stackName,
+        "stage" -> config.stage.toUpperCase,
+        "app"   -> config.appName,
+        "sessionId" -> config.sessionId
+      )).toString()
+    }
+
     if (config.isDev) {
       rootLogger.info("Kinesis logging disabled in DEV")
     } else {
