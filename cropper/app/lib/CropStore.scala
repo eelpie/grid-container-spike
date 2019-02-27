@@ -11,9 +11,6 @@ import com.gu.mediaservice.model._
 class CropStore(config: CropperConfig) extends S3ImageStorage(config) {
   import com.gu.mediaservice.lib.formatting._
 
-  def getSecureCropUri(uri: URI): Option[URL] =
-    config.imgPublishingSecureHost.map(new URI("https", _, uri.getPath, uri.getFragment).toURL)
-
   def storeCropSizing(file: File, filename: String, mimeType: String, crop: Crop, dimensions: Dimensions): Future[Asset] = {
     val CropSpec(sourceUri, Bounds(x, y, w, h), r, t) = crop.specification
     val metadata = Map("source" -> sourceUri,
@@ -96,7 +93,8 @@ class CropStore(config: CropperConfig) extends S3ImageStorage(config) {
     deleteFolder(config.imgPublishingBucket, id)
   }
 
-  // FIXME: this doesn't really belong here
-  def translateImgHost(uri: URI): URI =
-    new URI("https", config.imgPublishingHost, uri.getPath, uri.getFragment)
+  // TODO These look like URL builder concerns; do they belong here?
+  private def getSecureCropUri(uri: URI): Option[URL] = Some(translateImgHost(uri).toURL)
+  private  def translateImgHost(uri: URI): URI = new URI("https", config.imgPublishingSecureHost, uri.getPath, uri.getFragment)
+
 }

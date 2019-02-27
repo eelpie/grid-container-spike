@@ -15,8 +15,8 @@ class ImageLoaderConfig(override val configuration: Configuration) extends Commo
 
   val thumbnailBucket: String = configuration.get[String]("s3.thumb.bucket")
 
-  val configuredTempDir = configuration.getOptional[String]("upload.tmp.dir")
-  val tempDir: File = new File(configuredTempDir.getOrElse("/tmp")) // TODO Api call rather than /tmp
+  val tempDir: File = new File(configuration.getOptional[String]("upload.tmp.dir").
+    getOrElse("/tmp")) // TODO Api call rather than /tmp
 
   val thumbWidth: Int = 256
   val thumbQuality: Double = 85d // out of 100

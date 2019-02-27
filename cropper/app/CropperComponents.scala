@@ -13,7 +13,7 @@ import router.Routes
 class CropperComponents(context: Context) extends GridComponents(context) {
   final override lazy val config = new CropperConfig(configuration)
 
-  val services = new Services(config)
+  lazy val services = new Services(config)
 
   val store = new CropStore(config)
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)

@@ -9,16 +9,15 @@ class CropperConfig(override val configuration: Configuration) extends CommonCon
 
   final override lazy val appName = "cropper"
 
-  val imgPublishingBucket = properties("publishing.image.bucket")
+  val imgPublishingBucket: String = configuration.get[String]("publishing.image.bucket")
+  val imgPublishingSecureHost: String = configuration.get[String]("publishing.image.secure.host")
 
-  val imgPublishingHost = properties("publishing.image.host")
-  // Note: work around CloudFormation not allowing optional parameters
-  val imgPublishingSecureHost = properties.get("publishing.image.secure.host").filterNot(_.isEmpty)
+  val topicArn: Option[String] = configuration.getOptional[String]("sns.topic.arn")
 
-  val topicArn = configuration.getOptional[String]("sns.topic.arn")
-
-  val tempDir: File = new File(properties.getOrElse("crop.output.tmp.dir", "/tmp"))
+  val tempDir: File = new File(configuration.getOptional[String]("crop.output.tmp.dir").
+    getOrElse("/tmp")) // TODO Api call rather than /tmp
 
   val landscapeCropSizingWidths = List(2000, 1000, 500, 140)
   val portraitCropSizingHeights = List(2000, 1000, 500)
+
 }
