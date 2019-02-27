@@ -9,8 +9,8 @@ class CollectionsConfig(override val configuration: Configuration)(implicit ec: 
 
   override lazy val appName = "collections"
 
-  val collectionsTable = properties("dynamo.table.collections")
-  val imageCollectionsTable = properties("dynamo.table.imageCollections")
+  val collectionsTable = configuration.get[String]("dynamo.table.collections")
+  val imageCollectionsTable = configuration.get[String]("dynamo.table.imageCollections")
   val topicArn = configuration.getOptional[String]("sns.topic.arn")
 
 }
