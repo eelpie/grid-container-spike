@@ -1,8 +1,10 @@
 package lib
 
+import java.net.URI
+
 import com.amazonaws.regions.{Region, RegionUtils}
 import com.amazonaws.services.identitymanagement._
-import com.gu.mediaservice.lib.config.CommonConfig
+import com.gu.mediaservice.lib.config.{CommonConfig, Properties}
 import com.gu.mediaservice.lib.net.URI.ensureSecure
 import play.api.{Configuration, Logger}
 
@@ -19,38 +21,41 @@ class UsageConfig(override val configuration: Configuration) extends CommonConfi
   val defaultMaxPrintRequestSizeInKb = 500
   val defaultDateLimit = "2016-01-01T00:00:00+00:00"
 
+  // TODO want to drive out this Guardian native config file
+  lazy val properties: Map[String, String] = Properties.fromPath(s"/etc/gu/$appName.properties")
+
   val maxPrintRequestLengthInKb: Int = Try(properties("api.setPrint.maxLength").toInt).getOrElse[Int](defaultMaxPrintRequestSizeInKb)
 
-  val capiLiveUrl = properties("capi.live.url")
-  val capiApiKey = properties("capi.apiKey")
+  val capiLiveUrl: String = properties("capi.live.url")
+  val capiApiKey: String = properties("capi.apiKey")
   val capiPageSize: Int = Try(properties("capi.page.size").toInt).getOrElse[Int](defaultPageSize)
   val capiMaxRetries: Int = Try(properties("capi.maxRetries").toInt).getOrElse[Int](defaultMaxRetries)
 
   val usageDateLimit: String = Try(properties("usage.dateLimit")).getOrElse(defaultDateLimit)
 
-  val topicArn = configuration.getOptional[String]("sns.topic.arn")
+  val topicArn: Option[String] = configuration.getOptional[String]("sns.topic.arn")
 
   private val composerBaseUrlProperty: String = properties("composer.baseUrl")
-  private val composerBaseUrl = ensureSecure(composerBaseUrlProperty)
+  private val composerBaseUrl: URI = ensureSecure(composerBaseUrlProperty)
 
   val composerContentBaseUrl: String = s"$composerBaseUrl/content"
 
-  val usageRecordTable = properties("dynamo.tablename.usageRecordTable")
+  val usageRecordTable: String = properties("dynamo.tablename.usageRecordTable")
 
   val dynamoRegion: Region = RegionUtils.getRegion(properties("aws.region"))
-  val awsRegionName = properties("aws.region")
+  val awsRegionName: String = properties("aws.region")
 
-  val crierLiveKinesisStream = Try {
+  val crierLiveKinesisStream: Try[String] = Try {
     properties("crier.live.name")
   }
-  val crierPreviewKinesisStream = Try {
+  val crierPreviewKinesisStream: Try[String] = Try {
     properties("crier.preview.name")
   }
 
-  val crierLiveArn = Try {
+  val crierLiveArn: Try[String] = Try {
     properties("crier.live.arn")
   }
-  val crierPreviewArn = Try {
+  val crierPreviewArn: Try[String] = Try {
     properties("crier.preview.arn")
   }
 
