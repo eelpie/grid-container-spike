@@ -42,7 +42,7 @@ class MediaApiConfig(override val configuration: Configuration) extends CommonCo
     CloudFrontConfiguration(cloudFrontPrivateKeyLocation, cloudFrontKeyPairId)
   }
 
-  lazy val topicArn: String = configuration.get[String]("sns.topic.arn")
+  val topicArn = configuration.getOptional[String]("sns.topic.arn")
 
   lazy val requiredMetadata = List("credit", "description", "usageRights")
 

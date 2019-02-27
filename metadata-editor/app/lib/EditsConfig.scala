@@ -11,7 +11,7 @@ class EditsConfig(override val configuration: Configuration) extends CommonConfi
 
   val editsTable: String = configuration.get[String]("dynamo.table.edits")
 
-  val topicArn: String = configuration.get[String]("sns.topic.arn")
+  val topicArn = configuration.getOptional[String]("sns.topic.arn")
 
   val queueUrl: String = configuration.get[String]("indexed.images.sqs.queue.url")
 

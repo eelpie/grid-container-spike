@@ -15,7 +15,7 @@ class CropperConfig(override val configuration: Configuration) extends CommonCon
   // Note: work around CloudFormation not allowing optional parameters
   val imgPublishingSecureHost = properties.get("publishing.image.secure.host").filterNot(_.isEmpty)
 
-  val topicArn = properties("sns.topic.arn")
+  val topicArn = configuration.getOptional[String]("sns.topic.arn")
 
   val tempDir: File = new File(properties.getOrElse("crop.output.tmp.dir", "/tmp"))
 

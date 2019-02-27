@@ -26,8 +26,8 @@ class ThrallMessageConsumer(config: ThrallConfig,
 
   private val builder: KinesisClientLibConfiguration => Worker = new Worker.Builder().recordProcessorFactory(thrallEventProcessorFactory).config(_).build()
   private val thrallKinesisWorker = builder(
-    kinesisClientLibConfig(kinesisAppName = config.thrallKinesisStream,
-    streamName = config.thrallKinesisStream,
+    kinesisClientLibConfig(kinesisAppName = config.thrallKinesisStream.get, // TODO Naked get
+    streamName = config.thrallKinesisStream.get,  // TODO Naked get
     from = from
   ))
   private val thrallKinesisWorkerThread = makeThread(thrallKinesisWorker)

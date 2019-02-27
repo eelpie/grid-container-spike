@@ -9,7 +9,7 @@ class LeasesConfig(override val configuration: Configuration) extends CommonConf
 
   final override lazy val appName = "leases"
 
-  val topicArn = properties("sns.topic.arn")
+  val topicArn = configuration.getOptional[String]("sns.topic.arn")
 
   val leasesTable = properties("dynamo.tablename.leasesTable")
 

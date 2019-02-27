@@ -19,8 +19,8 @@ class UsageComponents(context: Context) extends GridComponents(context) {
   lazy val services = new Services(config)
 
   val publishers: Seq[MessageSenderVersion] = Seq(
-    new SNS(config, config.topicArn)
-  )
+    config.topicArn.map(topicArn => new SNS(config, topicArn))
+  ).flatten
 
   val usageMetadataBuilder = new UsageMetadataBuilder(config)
   val mediaWrapper = new MediaWrapperOps(usageMetadataBuilder)

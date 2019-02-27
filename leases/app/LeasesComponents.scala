@@ -11,8 +11,8 @@ class LeasesComponents(context: Context) extends GridComponents(context) {
   val services = new Services(config)
 
   val publishers: Seq[MessageSenderVersion] = Seq(
-    new SNS(config, config.topicArn)
-  )
+    config.topicArn.map(topicArn => new SNS(config, topicArn))
+  ).flatten
 
   val store = new LeaseStore(config)
   val notifications = new LeaseNotifier(publishers, store)

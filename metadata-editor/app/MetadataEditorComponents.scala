@@ -12,8 +12,8 @@ class MetadataEditorComponents(context: Context) extends GridComponents(context)
   lazy val services = new Services(config)
 
   val publishers: Seq[MessageSenderVersion] = Seq(
-    new SNS(config, config.topicArn)
-  )
+    config.topicArn.map(topicArn => new SNS(config, topicArn))
+  ).flatten
 
   val store = new EditsStore(config)
   val notifications = new Notifications(publishers)

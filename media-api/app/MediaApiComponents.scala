@@ -21,8 +21,8 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
   val publishers: Seq[MessageSenderVersion] = Seq(
-    new SNS(config, config.topicArn)
-  )
+    config.topicArn.map(topicArn => new SNS(config, topicArn))
+  ).flatten
 
   val messageSender = new MessageSender(publishers)
   val mediaApiMetrics = new MediaApiMetrics(config)

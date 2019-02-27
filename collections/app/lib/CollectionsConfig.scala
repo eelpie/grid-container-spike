@@ -11,6 +11,6 @@ class CollectionsConfig(override val configuration: Configuration)(implicit ec: 
 
   val collectionsTable = properties("dynamo.table.collections")
   val imageCollectionsTable = properties("dynamo.table.imageCollections")
-  val topicArn = properties("sns.topic.arn")
+  val topicArn = configuration.getOptional[String]("sns.topic.arn")
 
 }

@@ -30,7 +30,6 @@ class ThrallConfig(override val configuration: Configuration) extends CommonConf
 
   lazy val writeAlias: String = configuration.get[String]("es.index.aliases.write")
 
-
   lazy val healthyMessageRate: Int = configuration.get[Int]("sqs.message.min.frequency")
 
   // TODO what's this for?
