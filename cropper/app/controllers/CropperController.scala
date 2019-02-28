@@ -34,7 +34,6 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
 
   val mediaApiKey = auth.keyStore.findKey("cropper").getOrElse(throw new Error("Missing cropper API key in key bucket"))
 
-
   val indexResponse = {
     val indexData = Map("description" -> "This is the Cropper Service")
     val indexLinks = List(
@@ -138,17 +137,22 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
   // TODO: lame, parse into URI object and compare host instead
   def isMediaApiUri(uri: String): Boolean = uri.startsWith(services.apiBaseUri)
 
-  import org.apache.http.client.methods.HttpGet
-  import org.apache.http.client.utils.URIBuilder
-  import org.apache.http.impl.client.HttpClients
 
-  import scala.io.Source
 
   def fetchSourceFromApi(uri: String): Future[SourceImage] = {
 
+    import org.apache.http.client.methods.HttpGet
+    import org.apache.http.client.utils.URIBuilder
+    import org.apache.http.impl.client.HttpClients
+
+    import scala.io.Source
+
     case class HttpClientResponse(status: Int, statusText: String, json: JsValue)
 
-    val uriWithParams = new URIBuilder(uri)
+    val actualApiServiceUri = new URIBuilder(uri).setScheme("http").setHost("media-api.default.svc.cluster.local").setPort(9001).build()
+    Logger.info("Making call to API on URL: " + actualApiServiceUri)
+
+    val uriWithParams = new URIBuilder(actualApiServiceUri)
       .setParameter("include", "fileMetadata")
       .build
 
