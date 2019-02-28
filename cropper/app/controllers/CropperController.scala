@@ -16,6 +16,7 @@ import com.gu.mediaservice.model._
 import lib._
 import model._
 import org.joda.time.DateTime
+import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -26,7 +27,8 @@ case object ApiRequestFailed extends Exception("Failed to fetch the source")
 
 class CropperController(auth: Authentication, crops: Crops, store: CropStore, notifications: Notifications,
                         val config: CropperConfig,
-                        override val controllerComponents: ControllerComponents, services: Services, permissionsHandler: PermissionsHandler)(implicit val ec: ExecutionContext)
+                        override val controllerComponents: ControllerComponents, services: Services,
+                        permissionsHandler: PermissionsHandler, ws: WSClient)(implicit val ec: ExecutionContext)
   extends BaseController with ArgoHelpers {
 
   // Stupid name clash between Argo and Play
@@ -141,37 +143,21 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
 
   def fetchSourceFromApi(uri: String): Future[SourceImage] = {
 
-    import org.apache.http.client.methods.HttpGet
     import org.apache.http.client.utils.URIBuilder
-    import org.apache.http.impl.client.HttpClients
-
-    import scala.io.Source
 
     case class HttpClientResponse(status: Int, statusText: String, json: JsValue)
 
     val actualApiServiceUri = new URIBuilder(uri).setScheme("http").setHost("media-api.default.svc.cluster.local").setPort(9001).build()
     Logger.info("Making call to API on URL: " + actualApiServiceUri)
 
-    val uriWithParams = new URIBuilder(actualApiServiceUri)
-      .setParameter("include", "fileMetadata")
-      .build
+    val responseFuture = ws.url(actualApiServiceUri.toString).
+      withQueryStringParameters("include" -> "fileMetadata").
+      withHttpHeaders(("X-Gu-Media-Key", mediaApiKey)).get.map { r =>
 
-    // MUTANT!
-    val httpGet = new HttpGet(uriWithParams)
-    httpGet.addHeader("X-Gu-Media-Key", mediaApiKey)
-
-    val httpClientResponse = HttpClients.createDefault()
-      .execute(httpGet)
-
-    val responseFuture = Future {
-      val statusLine = httpClientResponse.getStatusLine()
-      val httpEntity = httpClientResponse.getEntity()
-
-      val status         = statusLine.getStatusCode
-      val statusText     = statusLine.getReasonPhrase
-
-      val entityAsString = Source.fromInputStream(httpEntity.getContent).mkString
-      val json           = Json.parse(entityAsString)
+      val status = r.status
+      val statusText     = r.statusText
+      Logger.info("Got HTTP status: " + status)
+      val json           = Json.parse(r.body)
 
       HttpClientResponse(status, statusText, json)
     }
@@ -180,10 +166,6 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
       case NonFatal(e) =>
           Logger.warn(s"HTTP request to fetch source failed: $e")
           Future.failed(ApiRequestFailed)
-    }
-
-    responseFuture onComplete {
-      case _ => httpClientResponse.close()
     }
 
     for (resp <- responseFuture)

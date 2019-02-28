@@ -36,7 +36,7 @@ class CropperComponents(context: Context) extends GridComponents(context) {
     new GrantAllPermissionsHandler()
   }
 
-  val controller = new CropperController(auth, crops, store, notifications, config, controllerComponents, services, permissionsHandler)
+  val controller = new CropperController(auth, crops, store, notifications, config, controllerComponents, services, permissionsHandler, wsClient)
   val permissionsAwareManagement = new ManagementWithPermissions(controllerComponents, permissionsHandler)
 
   override lazy val router = new Routes(httpErrorHandler, controller, permissionsAwareManagement)
