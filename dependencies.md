@@ -1,7 +1,6 @@
 # Minimum dependencies
 
 
-
 ## Image buckets
 
 S3 buckets are the Grid's primary input and outputs.
@@ -47,12 +46,22 @@ Update events intended for meta-data editor.
 
 
 
+## API Key bucket
+
+Needed for cropper
+
+ie.
+cropper-123abc
+```
+Cropper
+Internal
+```
+
+
+
 ## Optional dependencies
 
 ## Cloudfront
 
 ## Permissions bucket
-
-## API keys bucket
-
 
