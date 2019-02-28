@@ -23,7 +23,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class MessageConsumer(queueUrl: String, awsEndpoint: String, config: CommonConfig, metric: Metric[Long]) {
+abstract class MessageConsumer(queueUrl: String, awsEndpoint: String, config: CommonConfig, messageCountMetric: Metric[Long]) {
   val actorSystem = ActorSystem("MessageConsumer")
 
   private implicit val ctx: ExecutionContext =
@@ -71,7 +71,7 @@ abstract class MessageConsumer(queueUrl: String, awsEndpoint: String, config: Co
   }
 
   private def recordMessageCount(message: UpdateMessage) = {
-    metric.runRecordOne(1L, List(new Dimension().withName("subject").withValue(message.subject)))
+    messageCountMetric.runRecordOne(1L, List(new Dimension().withName("subject").withValue(message.subject)))
   }
 
   private def deleteOnSuccess(msg: SQSMessage)(f: Future[Any]): Unit =
