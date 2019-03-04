@@ -13,17 +13,6 @@ import scalaz.stream.Process.{constant, emitAll}
 import scalaz.stream.{Sink, async}
 import scalaz.stream.async.mutable.Topic
 
-trait Metric[A] {
-
-  def recordOne(a: A, dimensions: List[Dimension] = Nil): Task[Unit]
-
-  def recordMany(as: Seq[A], dimensions: List[Dimension] = Nil): Task[Unit]
-
-  def runRecordOne(a: A, dimensions: List[Dimension] = Nil): Unit
-
-  def runRecordMany(as: Seq[A], dimensions: List[Dimension] = Nil): Unit
-}
-
 abstract class CloudWatchMetrics(namespace: String, config: CommonConfig) {
 
   /** The maximum number of data points to report in one batch.
