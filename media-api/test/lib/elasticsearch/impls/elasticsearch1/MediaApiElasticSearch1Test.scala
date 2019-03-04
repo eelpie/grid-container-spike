@@ -8,7 +8,7 @@ import com.gu.mediaservice.model.usage.PublishedUsageStatus
 import com.gu.mediaservice.syntax._
 import lib.elasticsearch.{AggregateSearchParams, ElasticSearchTestBase, SearchParams}
 import lib.querysyntax.{HasField, HasValue, Match}
-import lib.{MediaApiConfig, MediaApiMetrics}
+import lib.{MediaApiConfig, CloudWatchMediaApiMetrics}
 import org.elasticsearch.action.delete.DeleteRequest
 import org.elasticsearch.common.unit.TimeValue
 import org.elasticsearch.index.query.QueryBuilders
@@ -37,7 +37,7 @@ class MediaApiElasticSearch1Test extends ElasticSearchTestBase with Eventually w
     "persistence.identifier" -> "picdarUrn",
   )))
 
-  private val mediaApiMetrics = new MediaApiMetrics(mediaApiConfig)
+  private val mediaApiMetrics = new CloudWatchMediaApiMetrics(mediaApiConfig)
   val elasticConfig = ElasticSearchConfig(alias = imageAlias, host = "localhost", port = 9301, cluster = "media-service-test")
 
   val ES = new ElasticSearch(mediaApiConfig, mediaApiMetrics, elasticConfig)

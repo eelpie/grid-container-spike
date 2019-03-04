@@ -2,13 +2,13 @@ package lib
 
 import com.amazonaws.services.cloudwatch.model.Dimension
 import com.gu.mediaservice.lib.auth.{ApiKey, Syndication, Tier}
-import com.gu.mediaservice.lib.metrics.CloudWatchMetrics
+import com.gu.mediaservice.lib.metrics.Metric
 
-class MediaApiMetrics(config: MediaApiConfig) extends CloudWatchMetrics(s"${config.stage}/MediaApi", config) {
+trait MediaApiMetrics {
 
-  val searchQueryDuration: TimeMetric = new TimeMetric("ElasticSearch")
+  def searchQueryDuration: Metric[Long] // TODO Is actually a duration
 
-  def metric(tier: Tier): CountMetric = new CountMetric(tier.toString)
+  def originalImageDownloadMetricForTier(tier: Tier):  Metric[Long]
 
   def incrementOriginalImageDownload(apiKey: ApiKey) = {
     // CW Metrics have a maximum of 10 dimensions per metric.
@@ -20,8 +20,7 @@ class MediaApiMetrics(config: MediaApiConfig) extends CloudWatchMetrics(s"${conf
 
     val dimension = new Dimension().withName("OriginalImageDownload").withValue(dimensionValue)
 
-    val tier: Tier = apiKey.tier
-    metric(tier).increment(List(dimension)).run
+    originalImageDownloadMetricForTier(apiKey.tier).runRecordOne(1, List(dimension))
   }
 
   def searchTypeDimension(value: String): Dimension =

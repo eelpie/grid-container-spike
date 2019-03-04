@@ -26,7 +26,7 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   ).flatten
 
   val messageSender = new MessageSender(publishers)
-  val mediaApiMetrics = new MediaApiMetrics(config)
+  val mediaApiMetrics = new CloudWatchMediaApiMetrics(config)
 
   val es1Config: Option[ElasticSearchConfig] = for {
     h <- config.elasticsearchHost
