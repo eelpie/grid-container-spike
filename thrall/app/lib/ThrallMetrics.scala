@@ -1,31 +1,31 @@
 package lib
 
-import com.gu.mediaservice.lib.metrics.CloudWatchMetrics
+import com.gu.mediaservice.lib.metrics.{CloudWatchMetrics, Metric}
 
 class ThrallMetrics(config: ThrallConfig) extends CloudWatchMetrics(s"${config.stage}/Thrall", config) {
 
-  val indexedImages = new CountMetric("IndexedImages")
+  val indexedImages: Metric[Long] = new CountMetric("IndexedImages")
 
-  val deletedImages = new CountMetric("DeletedImages")
+  val deletedImages: Metric[Long] = new CountMetric("DeletedImages")
 
-  val failedDeletedImages = new CountMetric("FailedDeletedImages")
+  val failedDeletedImages: Metric[Long] = new CountMetric("FailedDeletedImages")
 
-  val failedMetadataUpdates = new CountMetric("FailedMetadataUpdates")
+  val failedMetadataUpdates: Metric[Long] = new CountMetric("FailedMetadataUpdates")
 
-  val failedCollectionsUpdates = new CountMetric("FailedCollectionsUpdates")
+  val failedCollectionsUpdates: Metric[Long] = new CountMetric("FailedCollectionsUpdates")
 
-  val failedExportsUpdates = new CountMetric("FailedExportsUpdates")
+  val failedExportsUpdates: Metric[Long] = new CountMetric("FailedExportsUpdates")
 
-  val failedUsagesUpdates = new CountMetric("FailedUsagesUpdates")
+  val failedUsagesUpdates: Metric[Long] = new CountMetric("FailedUsagesUpdates")
 
-  val failedSyndicationRightsUpdates = new CountMetric("FailedSyndicationRightsUpdates")
+  val failedSyndicationRightsUpdates: Metric[Long] = new CountMetric("FailedSyndicationRightsUpdates")
 
-  val failedQueryUpdates = new CountMetric("FailedQueryUpdates")
+  val failedQueryUpdates: Metric[Long] = new CountMetric("FailedQueryUpdates")
 
-  val failedDeletedAllUsages = new CountMetric("FailedDeletedAllUsages")
+  val failedDeletedAllUsages: Metric[Long] = new CountMetric("FailedDeletedAllUsages")
 
-  val processingLatency = new TimeMetric("ProcessingLatency")
+  val processingLatency: Metric[Long] = new TimeMetric("ProcessingLatency") // TODO Time aspect is lost in the Metrics interace
 
-  val snsMessage = new CountMetric("SNSMessage")
+  val snsMessage: Metric[Long] = new CountMetric("SNSMessage")
 
 }
