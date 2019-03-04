@@ -1,17 +1,16 @@
 package com.gu.mediaservice.lib.metrics
 
-import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.services.cloudwatch.model.{Dimension, MetricDatum, PutMetricDataRequest, StandardUnit}
 import com.amazonaws.services.cloudwatch.{AmazonCloudWatch, AmazonCloudWatchClientBuilder}
 import com.gu.mediaservice.lib.config.CommonConfig
 import org.slf4j.LoggerFactory
+import scalaz.concurrent.Task
+import scalaz.stream.Process.{constant, emitAll}
+import scalaz.stream.async.mutable.Topic
+import scalaz.stream.{Sink, async}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
-import scalaz.concurrent.Task
-import scalaz.stream.Process.{constant, emitAll}
-import scalaz.stream.{Sink, async}
-import scalaz.stream.async.mutable.Topic
 
 abstract class CloudWatchMetrics(namespace: String, config: CommonConfig) {
 

@@ -1,6 +1,7 @@
 package lib
 
 import com.gu.mediaservice.lib.aws.{MessageConsumer, UpdateMessage}
+import com.gu.mediaservice.lib.metrics.Metric
 import lib.kinesis.MessageProcessor
 import org.joda.time.DateTime
 
@@ -12,12 +13,13 @@ class ThrallMessageConsumer(
   thrallMetrics: ThrallMetrics,
   store: ThrallStore,
   metadataNotifications: DynamoNotifications,
-  syndicationRightsOps: SyndicationRightsOps
+  syndicationRightsOps: SyndicationRightsOps,
+  messageCountMetric: Metric[Long]
 )(implicit ec: ExecutionContext) extends MessageConsumer (
   config.queueUrl,
   config.awsEndpoint,
   config,
-  thrallMetrics.snsMessage
+  messageCountMetric
 ) with MessageConsumerVersion {
 
   val messageProcessor = new MessageProcessor(es, store, metadataNotifications, syndicationRightsOps)
