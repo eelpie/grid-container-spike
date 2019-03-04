@@ -21,12 +21,6 @@ class CloudWatchThrallMetrics(config: ThrallConfig) extends CloudWatchMetrics(s"
 
   val failedSyndicationRightsUpdates: Metric[Long] = new CountMetric("FailedSyndicationRightsUpdates")
 
-  val failedQueryUpdates: Metric[Long] = new CountMetric("FailedQueryUpdates")
-
-  val failedDeletedAllUsages: Metric[Long] = new CountMetric("FailedDeletedAllUsages")
-
-  val processingLatency: Metric[Long] = new TimeMetric("ProcessingLatency") // TODO Time aspect is lost in the Metrics interace
-
   val snsMessage: Metric[Long] = new CountMetric("SNSMessage")
 
 }

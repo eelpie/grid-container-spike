@@ -19,12 +19,6 @@ trait ThrallMetrics {
   def failedUsagesUpdates: Metric[Long]
   def failedSyndicationRightsUpdates: Metric[Long] 
 
-  def failedQueryUpdates: Metric[Long]
-
-  def failedDeletedAllUsages: Metric[Long]
-
-  def processingLatency: Metric[Long]  // TODO Time aspect is lost in the Metrics interace
-
   def snsMessage: Metric[Long] 
 
 }
