@@ -1,31 +1,30 @@
 package lib
 
-import com.gu.mediaservice.lib.metrics.{CloudWatchMetrics, Metric}
+import com.gu.mediaservice.lib.metrics.Metric
 
-class ThrallMetrics(config: ThrallConfig) extends CloudWatchMetrics(s"${config.stage}/Thrall", config) {
+trait ThrallMetrics {
 
-  val indexedImages: Metric[Long] = new CountMetric("IndexedImages")
+  def indexedImages: Metric[Long]
 
-  val deletedImages: Metric[Long] = new CountMetric("DeletedImages")
+  def deletedImages: Metric[Long] 
 
-  val failedDeletedImages: Metric[Long] = new CountMetric("FailedDeletedImages")
+  def failedDeletedImages: Metric[Long]
 
-  val failedMetadataUpdates: Metric[Long] = new CountMetric("FailedMetadataUpdates")
+  def failedMetadataUpdates: Metric[Long]
 
-  val failedCollectionsUpdates: Metric[Long] = new CountMetric("FailedCollectionsUpdates")
+  def failedCollectionsUpdates: Metric[Long] 
 
-  val failedExportsUpdates: Metric[Long] = new CountMetric("FailedExportsUpdates")
+  def failedExportsUpdates: Metric[Long]
 
-  val failedUsagesUpdates: Metric[Long] = new CountMetric("FailedUsagesUpdates")
+  def failedUsagesUpdates: Metric[Long]
+  def failedSyndicationRightsUpdates: Metric[Long] 
 
-  val failedSyndicationRightsUpdates: Metric[Long] = new CountMetric("FailedSyndicationRightsUpdates")
+  def failedQueryUpdates: Metric[Long]
 
-  val failedQueryUpdates: Metric[Long] = new CountMetric("FailedQueryUpdates")
+  def failedDeletedAllUsages: Metric[Long]
 
-  val failedDeletedAllUsages: Metric[Long] = new CountMetric("FailedDeletedAllUsages")
+  def processingLatency: Metric[Long]  // TODO Time aspect is lost in the Metrics interace
 
-  val processingLatency: Metric[Long] = new TimeMetric("ProcessingLatency") // TODO Time aspect is lost in the Metrics interace
-
-  val snsMessage: Metric[Long] = new CountMetric("SNSMessage")
+  def snsMessage: Metric[Long] 
 
 }
