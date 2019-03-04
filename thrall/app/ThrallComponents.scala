@@ -70,7 +70,7 @@ class ThrallComponents(context: Context) extends GridComponents(context) {
   val syndicationOps = new SyndicationRightsOps(es)
 
   val thrallMessageConsumer = new ThrallMessageConsumer(config, elasticSearches.head, store,
-    dynamoNotifications, syndicationOps, thrallMetrics.snsMessage)
+    dynamoNotifications, syndicationOps, thrallMetrics)
   thrallMessageConsumer.startSchedule()
   context.lifecycle.addStopHook {
     () => thrallMessageConsumer.actorSystem.terminate()
