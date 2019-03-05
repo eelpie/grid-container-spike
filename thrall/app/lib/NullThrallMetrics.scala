@@ -9,22 +9,14 @@ import scala.concurrent.Future
 class NullThrallMetrics extends ThrallMetrics {
 
   val indexedImages = new NullMetric[Long]
-
-  val deletedImages: Metric[Long] = new NullMetric[Long]
-
-  val failedDeletedImages: Metric[Long] = new NullMetric[Long]
-
-  val failedMetadataUpdates: Metric[Long] = new NullMetric[Long]
-
-  val failedCollectionsUpdates: Metric[Long] = new NullMetric[Long]
-
-  val failedExportsUpdates: Metric[Long] = new NullMetric[Long]
-
-  val failedUsagesUpdates: Metric[Long] = new NullMetric[Long]
-
-  val failedSyndicationRightsUpdates: Metric[Long] = new NullMetric[Long]
-
-  val snsMessage: Metric[Long] = new NullMetric[Long]
+  val deletedImages = new NullMetric[Long]
+  val failedDeletedImages = new NullMetric[Long]
+  val failedMetadataUpdates = new NullMetric[Long]
+  val failedCollectionsUpdates = new NullMetric[Long]
+  val failedExportsUpdates = new NullMetric[Long]
+  val failedUsagesUpdates = new NullMetric[Long]
+  val failedSyndicationRightsUpdates = new NullMetric[Long]
+  val snsMessage = new NullMetric[Long]
 
 
   class NullMetric[A] extends Metric[A] {
