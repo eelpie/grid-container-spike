@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.elasticsearch.ElasticSearchConfig
 import com.gu.mediaservice.lib.elasticsearch6.ElasticSearch6Config
 import com.gu.mediaservice.lib.logging.GridLogger
@@ -7,7 +8,6 @@ import lib._
 import play.api.ApplicationLoader.Context
 import play.api.Logger
 import router.Routes
-import com.gu.mediaservice.lib.config.Services
 
 class ThrallComponents(context: Context) extends GridComponents(context) {
 
@@ -16,7 +16,13 @@ class ThrallComponents(context: Context) extends GridComponents(context) {
 
   val store = new ThrallStore(config)
   val dynamoNotifications = new DynamoNotifications(config)
-  val thrallMetrics = new NullThrallMetrics
+
+  val metrics = config.cloudWatchNamespace.map { ns =>
+    new CloudWatchThrallMetrics(ns, config.withAWSCredentials)
+  }.getOrElse {
+    Logger.info("CloudWatch metrics are not configured.")
+    new NullThrallMetrics
+  }
 
   val es1Config = for {
     h <- config.elasticsearchHost
@@ -52,13 +58,13 @@ class ThrallComponents(context: Context) extends GridComponents(context) {
   val elasticSearches = Seq(
     es1Config.map { c =>
       Logger.info("Configuring ES1: " + c)
-      val es1 = new ElasticSearch(c, thrallMetrics)
+      val es1 = new ElasticSearch(c, metrics)
       es1.ensureAliasAssigned()
       es1
     },
     es6Config.map { c =>
       Logger.info("Configuring ES6: " + c)
-      val es6 = new ElasticSearch6(c, thrallMetrics)
+      val es6 = new ElasticSearch6(c, metrics)
       es6.ensureAliasAssigned()
       es6
     }
@@ -70,14 +76,14 @@ class ThrallComponents(context: Context) extends GridComponents(context) {
   val syndicationOps = new SyndicationRightsOps(es)
 
   val thrallMessageConsumer = new ThrallMessageConsumer(config, elasticSearches.head, store,
-    dynamoNotifications, syndicationOps, thrallMetrics)
+    dynamoNotifications, syndicationOps, metrics)
   thrallMessageConsumer.startSchedule()
   context.lifecycle.addStopHook {
     () => thrallMessageConsumer.actorSystem.terminate()
   }
 
   elasticSearches.lift(1).map { es =>
-    val thrallKinesisMessageConsumer = new kinesis.ThrallMessageConsumer(config, es, thrallMetrics,
+    val thrallKinesisMessageConsumer = new kinesis.ThrallMessageConsumer(config, es, metrics,
       store, dynamoNotifications, syndicationOps, config.from)
     thrallKinesisMessageConsumer.start()
   }

@@ -26,7 +26,13 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   ).flatten
 
   val messageSender = new MessageSender(publishers)
-  val mediaApiMetrics = new CloudWatchMediaApiMetrics(config.cloudWatchNamespace, config.withAWSCredentials)
+
+  val metrics = config.cloudWatchNamespace.map{ ns =>
+    new CloudWatchMediaApiMetrics(ns, config.withAWSCredentials)
+  }.getOrElse{
+    Logger.info("CloudWatch metrics are not configured.")
+    new NullMediaApiMetrics
+  }
 
   val es1Config: Option[ElasticSearchConfig] = for {
     h <- config.elasticsearchHost
@@ -60,13 +66,13 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   val elasticSearches = Seq(
     es1Config.map { c =>
       Logger.info("Configuring ES1: " + c)
-      val es1 = new lib.elasticsearch.impls.elasticsearch1.ElasticSearch(config, mediaApiMetrics, c)
+      val es1 = new lib.elasticsearch.impls.elasticsearch1.ElasticSearch(config, metrics, c)
       es1.ensureAliasAssigned()
       es1
     },
     es6Config.map { c =>
       Logger.info("Configuring ES6: " + c)
-      val es6 = new lib.elasticsearch.impls.elasticsearch6.ElasticSearch(config, mediaApiMetrics, c)
+      val es6 = new lib.elasticsearch.impls.elasticsearch6.ElasticSearch(config, metrics, c)
       es6.ensureAliasAssigned()
       es6
     }
@@ -108,7 +114,7 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   }
 
   val mediaApi = new MediaApi(auth, messageSender, elasticSearch, imageResponse, config, controllerComponents, imageBucket,
-    mediaApiMetrics, services, permissionsHandler)
+    metrics, services, permissionsHandler)
   val suggestionController = new SuggestionController(auth, elasticSearch, controllerComponents)
   val aggController = new AggregationController(auth, elasticSearch, controllerComponents)
   val usageController = new UsageController(auth, config, elasticSearch, enabledUsageQuota, controllerComponents)

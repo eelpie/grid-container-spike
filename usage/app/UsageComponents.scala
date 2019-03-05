@@ -5,6 +5,7 @@ import controllers.UsageApi
 import lib._
 import model._
 import play.api.ApplicationLoader.Context
+import play.api.Logger
 import router.Routes
 
 import scala.concurrent.Future
@@ -28,9 +29,16 @@ class UsageComponents(context: Context) extends GridComponents(context) {
   val liveContentApi = new LiveContentApi(config)
   val usageGroup = new UsageGroupOps(config, mediaUsage, liveContentApi, mediaWrapper, services)
   val usageTable = new UsageTable(config, mediaUsage)
-  val usageMetrics = new CloudWatchUsageMetrics(config.cloudWatchNamespace, config.withAWSCredentials)
   val usageNotifier = new UsageNotifier(publishers, usageTable)
   val usageStream = new UsageStream(usageGroup)
+
+  val usageMetrics = config.cloudWatchNamespace.map{ ns =>
+    new CloudWatchUsageMetrics(ns, config.withAWSCredentials)
+  }.getOrElse{
+    Logger.info("CloudWatch metrics are not configured.")
+    new NullUsageMetrics
+  }
+
   val usageRecorder = new UsageRecorder(usageMetrics, usageTable, usageStream, usageNotifier, usageNotifier)
   val notifications = new Notifications(publishers)
 

@@ -5,6 +5,7 @@ import com.gu.mediaservice.lib.play.GridComponents
 import controllers.{EditsApi, EditsController}
 import lib._
 import play.api.ApplicationLoader.Context
+import play.api.Logger
 import router.Routes
 
 class MetadataEditorComponents(context: Context) extends GridComponents(context) {
@@ -20,7 +21,13 @@ class MetadataEditorComponents(context: Context) extends GridComponents(context)
   val notifications = new Notifications(publishers)
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
-  val metrics = new CloudWatchMetadataEditorMetrics(config.cloudWatchNamespace, config.withAWSCredentials)
+  val metrics = config.cloudWatchNamespace.map { ns =>
+    new CloudWatchMetadataEditorMetrics(ns, config.withAWSCredentials)
+  }.getOrElse {
+    Logger.info("CloudWatch metrics are not configured.")
+    new NullMetadataEditorMetrics
+  }
+
   val messageConsumer = new MetadataMessageConsumer(config, metrics, store)
 
   messageConsumer.startSchedule()

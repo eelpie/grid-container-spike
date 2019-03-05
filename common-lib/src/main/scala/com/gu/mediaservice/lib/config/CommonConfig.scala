@@ -42,9 +42,9 @@ trait CommonConfig {
     .withRegion(awsRegion)
     .withCredentials(awsCredentials)
 
-  final val stage: String = stageFromFile getOrElse "DEV"
+  final val cloudWatchNamespace = configuration.getOptional[String]("cloudwatch.namespace")
 
-  final val cloudWatchNamespace = stage  // TODO push to config to toggle cloudwatch
+  final val stage: String = stageFromFile getOrElse "DEV"
 
   val isProd: Boolean = stage == "PROD"
   val isDev: Boolean = stage == "DEV"
