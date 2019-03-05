@@ -9,7 +9,7 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http._
 import lib.elasticsearch.{AggregateSearchParams, ElasticSearchTestBase, SearchParams}
 import lib.querysyntax._
-import lib.{MediaApiConfig, CloudWatchMediaApiMetrics}
+import lib.{CloudWatchMediaApiMetrics, MediaApiConfig, NullMediaApiMetrics}
 import org.joda.time.DateTime
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
@@ -31,11 +31,10 @@ class MediaApiElasticSearch6Test extends ElasticSearchTestBase with Eventually w
   private val mediaApiConfig = new MediaApiConfig(Configuration.from(Map(
     "persistence.identifier" -> "picdarUrn")))
 
-  private val mediaApiMetrics = new CloudWatchMediaApiMetrics(mediaApiConfig)
   val elasticConfig = ElasticSearch6Config(alias = "readAlias", host = "localhost", port = 9206,
     cluster = "media-service-test", shards = 1, replicas = 0)
 
-  private val ES = new ElasticSearch(mediaApiConfig, mediaApiMetrics, elasticConfig)
+  private val ES = new ElasticSearch(mediaApiConfig, new NullMediaApiMetrics, elasticConfig)
   val client = ES.client
 
   private val expectedNumberOfImages = images.size

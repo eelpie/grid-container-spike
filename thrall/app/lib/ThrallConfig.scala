@@ -1,6 +1,5 @@
 package lib
 
-import com.amazonaws.services.ec2.AmazonEC2ClientBuilder
 import com.gu.mediaservice.lib.config.CommonConfig
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat

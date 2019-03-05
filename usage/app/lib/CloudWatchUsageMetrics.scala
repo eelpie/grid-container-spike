@@ -1,9 +1,10 @@
 package lib
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder
 import com.gu.mediaservice.lib.metrics.CloudWatchMetrics
 
-class CloudWatchUsageMetrics(config: UsageConfig) extends CloudWatchMetrics(s"${config.stage}/Usage", config)
-  with UsageMetrics {
+class CloudWatchUsageMetrics(namespace: String, withAWSCredentials: AmazonCloudWatchClientBuilder => AmazonCloudWatchClientBuilder)
+  extends CloudWatchMetrics(namespace + "/Usage", withAWSCredentials) with UsageMetrics {
 
   def incrementUpdated = updates.increment().run
   def incrementErrors = errors.increment().run

@@ -1,10 +1,11 @@
 package lib
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder
 import com.gu.mediaservice.lib.auth.Tier
-import com.gu.mediaservice.lib.metrics.{CloudWatchMetrics, Metric}
+import com.gu.mediaservice.lib.metrics.CloudWatchMetrics
 
-class CloudWatchMediaApiMetrics(config: MediaApiConfig) extends CloudWatchMetrics(s"${config.stage}/MediaApi", config)
-with MediaApiMetrics {
+class CloudWatchMediaApiMetrics(namespace: String, withAWSCredentials: AmazonCloudWatchClientBuilder => AmazonCloudWatchClientBuilder)
+  extends CloudWatchMetrics(namespace + "/MediaApi", withAWSCredentials) with MediaApiMetrics {
 
   override val searchQueryDuration: TimeMetric = new TimeMetric("ElasticSearch")
 

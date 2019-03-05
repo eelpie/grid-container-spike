@@ -1,9 +1,10 @@
 package lib
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder
 import com.gu.mediaservice.lib.metrics.{CloudWatchMetrics, Metric}
 
-class CloudWatchThrallMetrics(config: ThrallConfig) extends CloudWatchMetrics(s"${config.stage}/Thrall", config)
-  with ThrallMetrics {
+class CloudWatchThrallMetrics(namespace: String, withAWSCredentials: AmazonCloudWatchClientBuilder => AmazonCloudWatchClientBuilder)
+  extends CloudWatchMetrics(namespace + "/Thrall", withAWSCredentials) with ThrallMetrics {
 
   val indexedImages = new CountMetric("IndexedImages")
 

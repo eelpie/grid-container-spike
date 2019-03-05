@@ -44,6 +44,8 @@ trait CommonConfig {
 
   final val stage: String = stageFromFile getOrElse "DEV"
 
+  final val cloudWatchNamespace = stage  // TODO push to config to toggle cloudwatch
+
   val isProd: Boolean = stage == "PROD"
   val isDev: Boolean = stage == "DEV"
 
