@@ -2,7 +2,7 @@ import com.gu.mediaservice.lib.aws.{Kinesis, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
 import controllers.{CollectionsController, ImageCollectionsController}
-import lib.{CollectionsConfig, CollectionsMetrics, Notifications}
+import lib.{CollectionsConfig, Notifications}
 import play.api.ApplicationLoader.Context
 import router.Routes
 import store.CollectionsStore
@@ -18,7 +18,6 @@ class CollectionsComponents(context: Context) extends GridComponents(context) {
   ).flatten
 
   val store = new CollectionsStore(config)
-  val metrics = new CollectionsMetrics(config)
   val notifications = new Notifications(publishers)
 
   val collections = new CollectionsController(auth, config, store, controllerComponents, services)
