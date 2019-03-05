@@ -3,10 +3,11 @@ package lib
 import com.amazonaws.services.cloudwatch.model.Dimension
 import com.gu.mediaservice.lib.auth.{ApiKey, Syndication, Tier}
 import com.gu.mediaservice.lib.metrics.Metric
+import org.joda.time.Duration
 
 trait MediaApiMetrics {
 
-  def searchQueryDuration: Metric[Long] // TODO Is actually a duration
+  def searchQueryDuration: Metric[Duration]
 
   def originalImageDownloadMetricForTier(tier: Tier):  Metric[Long]
 

@@ -41,8 +41,8 @@ abstract class CloudWatchMetrics(namespace: String, config: CommonConfig) {
 
   }
 
-  class TimeMetric(name: String) extends CloudWatchMetric[Long](name) {
-    protected def toDatum(a: Long, dimensions: List[Dimension]) = datum(StandardUnit.Milliseconds, a, dimensions)
+  class TimeMetric(name: String) extends CloudWatchMetric[org.joda.time.Duration](name) {
+    protected def toDatum(a: org.joda.time.Duration, dimensions: List[Dimension]) = datum(StandardUnit.Milliseconds, a.getMillis, dimensions)
   }
 
   private lazy val logger = LoggerFactory.getLogger(getClass)

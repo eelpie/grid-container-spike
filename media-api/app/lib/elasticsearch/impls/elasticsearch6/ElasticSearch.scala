@@ -5,7 +5,7 @@ import com.gu.mediaservice.lib.elasticsearch.ImageFields
 import com.gu.mediaservice.lib.elasticsearch6.{ElasticSearch6Config, ElasticSearch6Executions, ElasticSearchClient, Mappings}
 import com.gu.mediaservice.lib.metrics.FutureSyntax
 import com.gu.mediaservice.model.{Agencies, Image}
-import com.sksamuel.elastic4s.http.ElasticDsl
+import com.sksamuel.elastic4s.http.{ElasticDsl, Response}
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.search.{Aggregations, SearchHit, SearchResponse}
 import com.sksamuel.elastic4s.searches.DateHistogramInterval
@@ -14,6 +14,7 @@ import com.sksamuel.elastic4s.searches.queries.Query
 import lib.elasticsearch._
 import lib.querysyntax.{HierarchyField, Match, Phrase}
 import lib.{MediaApiConfig, MediaApiMetrics, SupplierUsageSummary}
+import org.joda.time.Duration
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.AnyContent
@@ -137,7 +138,7 @@ class ElasticSearch(val config: MediaApiConfig, mediaApiMetrics: MediaApiMetrics
     val searchRequest = prepareSearch(withFilter) from params.offset size params.length sortBy sort
 
     executeAndLog(searchRequest, "image search").
-      toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("results")))(_.result.took).map { r =>
+      toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("results")))(responseTook).map { r =>
       val imageHits = r.result.hits.hits.map(resolveHit).toSeq.flatten.map(i => (i.id, i))
       SearchResults(hits = imageHits, total = r.result.totalHits)
     }
@@ -197,7 +198,7 @@ class ElasticSearch(val config: MediaApiConfig, mediaApiMetrics: MediaApiMetrics
     val search = prepareSearch(query) aggregations aggregation size 0
 
     executeAndLog(search, s"$name aggregate search")
-      .toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("aggregate")))(_.result.took).map { r =>
+      .toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("aggregate")))(responseTook).map { r =>
       searchResultToAggregateResponse(r.result, name, extract)
     }
   }
@@ -210,7 +211,7 @@ class ElasticSearch(val config: MediaApiConfig, mediaApiMetrics: MediaApiMetrics
   override def completionSuggestion(name: String, q: String, size: Int)(implicit ex: ExecutionContext, request: AuthenticatedRequest[AnyContent, Principal]): Future[CompletionSuggestionResults] = {
     val completionSuggestion = ElasticDsl.completionSuggestion(name).on(name).text(q).skipDuplicates(true)
     executeAndLog(ElasticDsl.search(imagesAlias) suggestions completionSuggestion, "completion suggestion query").
-      toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("suggestion-completion")))(_.result.took).map { r =>
+      toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("suggestion-completion")))(responseTook).map { r =>
       val x = r.result.suggestions.get(name).map { suggestions =>
         suggestions.flatMap { s =>
           s.toCompletion.options.map { o =>
@@ -234,5 +235,7 @@ class ElasticSearch(val config: MediaApiConfig, mediaApiMetrics: MediaApiMetrics
         None
     }
   }
+
+  private def responseTook(r: Response[SearchResponse]): Duration = new Duration(r.result.took)
 
 }

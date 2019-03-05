@@ -15,6 +15,7 @@ import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram
 import org.elasticsearch.search.aggregations.{AbstractAggregationBuilder, AggregationBuilders}
 import org.elasticsearch.search.suggest.completion.{CompletionSuggestion, CompletionSuggestionBuilder}
+import org.joda.time.Duration
 import play.api.mvc.AnyContent
 import play.api.mvc.Security.AuthenticatedRequest
 import scalaz.NonEmptyList
@@ -113,7 +114,7 @@ class ElasticSearch(val config: MediaApiConfig, mediaApiMetrics: MediaApiMetrics
       .setFrom(params.offset)
       .setSize(params.length)
       .executeAndLog("image search")
-      .toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("results")))(_.getTookInMillis)
+      .toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("results")))(responseTook)
       .map(_.getHits)
       .map { results =>
         val hitsTuples = results.hits.toList flatMap (h => h.sourceOpt map (h.id -> _.as[Image]))
@@ -184,7 +185,7 @@ class ElasticSearch(val config: MediaApiConfig, mediaApiMetrics: MediaApiMetrics
     search
       .setSearchType(SearchType.COUNT)
       .executeAndLog(s"$name aggregate search")
-      .toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("aggregate")))(_.getTookInMillis)
+      .toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("aggregate")))(responseTook)
       .map(searchResultToAggregateResponse(_, name))
   }
 
@@ -194,7 +195,7 @@ class ElasticSearch(val config: MediaApiConfig, mediaApiMetrics: MediaApiMetrics
 
     search
       .executeAndLog("completion suggestion query")
-      .toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("suggestion-completion")))(_.getTookInMillis)
+      .toMetric(mediaApiMetrics.searchQueryDuration, List(mediaApiMetrics.searchTypeDimension("suggestion-completion")))(responseTook)
       .map { response =>
         val options =
           response.getSuggest
@@ -232,5 +233,7 @@ class ElasticSearch(val config: MediaApiConfig, mediaApiMetrics: MediaApiMetrics
 
   private def prepareImagesSearch: SearchRequestBuilder =
     client.prepareSearch(imagesAlias).setTypes(imageType)
+
+  private def responseTook(r: SearchResponse): Duration = new Duration(r.getTookInMillis)
 
 }
