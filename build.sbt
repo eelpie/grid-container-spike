@@ -6,6 +6,7 @@ val commonSettings = Seq(
   description := "grid",
   organization := "com.gu",
   dockerUsername := Some("eelpie"),
+  dockerUpdateLatest := true,
   version := "0.1",
   scalacOptions ++= Seq("-feature", "-deprecation", "-language:higherKinds", "-Xfatal-warnings"),
   libraryDependencies ++= Seq(
