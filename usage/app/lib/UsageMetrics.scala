@@ -1,11 +1,6 @@
 package lib
 
-import com.gu.mediaservice.lib.metrics.CloudWatchMetrics
-
-class UsageMetrics(config: UsageConfig) extends CloudWatchMetrics(s"${config.stage}/Usage", config) {
-  def incrementUpdated = updates.increment().run
-  def incrementErrors = errors.increment().run
-
-  private val updates = new CountMetric("UsageUpdates")
-  private val errors = new CountMetric("UsageUpdateErrors")
+trait UsageMetrics {
+  def incrementUpdated: Unit
+  def incrementErrors: Unit
 }

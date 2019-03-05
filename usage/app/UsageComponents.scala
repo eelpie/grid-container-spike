@@ -28,7 +28,7 @@ class UsageComponents(context: Context) extends GridComponents(context) {
   val liveContentApi = new LiveContentApi(config)
   val usageGroup = new UsageGroupOps(config, mediaUsage, liveContentApi, mediaWrapper, services)
   val usageTable = new UsageTable(config, mediaUsage)
-  val usageMetrics = new UsageMetrics(config)
+  val usageMetrics = new CloudWatchUsageMetrics(config)
   val usageNotifier = new UsageNotifier(publishers, usageTable)
   val usageStream = new UsageStream(usageGroup)
   val usageRecorder = new UsageRecorder(usageMetrics, usageTable, usageStream, usageNotifier, usageNotifier)

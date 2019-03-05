@@ -20,7 +20,7 @@ class MetadataEditorComponents(context: Context) extends GridComponents(context)
   val notifications = new Notifications(publishers)
   val imageOperations = new ImageOperations(context.environment.rootPath.getAbsolutePath)
 
-  val metrics = new MetadataEditorMetrics(config)
+  val metrics = new CloudWatchMetadataEditorMetrics(config)
   val messageConsumer = new MetadataMessageConsumer(config, metrics, store)
 
   messageConsumer.startSchedule()

@@ -1,9 +1,9 @@
 package lib
 
-import com.gu.mediaservice.lib.metrics.CloudWatchMetrics
+import com.gu.mediaservice.lib.metrics.Metric
 
-class MetadataEditorMetrics(config: EditsConfig) extends CloudWatchMetrics(s"${config.stage}/MetadataEditor", config) {
+trait MetadataEditorMetrics {
 
-  val snsMessage = new CountMetric("SNSMessage")
+  def snsMessage: Metric[Long]
 
 }
