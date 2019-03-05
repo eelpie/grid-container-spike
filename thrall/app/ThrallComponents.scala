@@ -16,7 +16,7 @@ class ThrallComponents(context: Context) extends GridComponents(context) {
 
   val store = new ThrallStore(config)
   val dynamoNotifications = new DynamoNotifications(config)
-  val thrallMetrics = new CloudWatchThrallMetrics(config)
+  val thrallMetrics = new NullThrallMetrics
 
   val es1Config = for {
     h <- config.elasticsearchHost
