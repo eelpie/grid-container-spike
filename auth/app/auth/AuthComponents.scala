@@ -1,6 +1,6 @@
 package auth
 
-import com.gu.mediaservice.lib.auth.{GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler, PermissionsHandler}
+import com.gu.mediaservice.lib.auth.{Authentication, GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler, PermissionsHandler}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.management.ManagementWithPermissions
 import com.gu.mediaservice.lib.play.GridComponents
@@ -19,9 +19,10 @@ class AuthComponents(context: Context) extends GridComponents(context) {
     new GuardianEditorialPermissionsHandler(permissionsBucket, permissionsStage, config)
   }).getOrElse{
     Logger.warn("No permissions handler is configured; granting all permissions to all users.")
-    new GrantAllPermissionsHandler()
+    new GrantAllPermissionsHandler
   }
 
+  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
   val controller = new AuthController(auth, config, controllerComponents, services, permissionsHandler)
   val permissionsAwareManagement = new ManagementWithPermissions(controllerComponents, permissionsHandler)
 

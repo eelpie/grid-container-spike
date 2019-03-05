@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.aws.{Kinesis, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
@@ -20,6 +21,7 @@ class CollectionsComponents(context: Context) extends GridComponents(context) {
   val store = new CollectionsStore(config)
   val notifications = new Notifications(publishers)
 
+  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
   val collections = new CollectionsController(auth, config, store, controllerComponents, services)
   val imageCollections = new ImageCollectionsController(auth, config, notifications, controllerComponents)
 

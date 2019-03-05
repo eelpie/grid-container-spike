@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
 import controllers.{AssetsComponents, KahunaController}
@@ -13,6 +14,7 @@ class KahunaComponents(context: Context) extends GridComponents(context) with As
 
   final override lazy val securityHeadersConfig: SecurityHeadersConfig = KahunaSecurityConfig(config, context.initialConfiguration, services)
 
+  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
   val controller = new KahunaController(auth, config, controllerComponents, services)
   final override val router = new Routes(httpErrorHandler, controller, assets, management)
 }

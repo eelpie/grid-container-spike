@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.aws.{Kinesis, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.imaging.ImageOperations
@@ -35,6 +36,7 @@ class MetadataEditorComponents(context: Context) extends GridComponents(context)
     () => messageConsumer.actorSystem.terminate()
   }
 
+  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
   val editsController = new EditsController(auth, store, notifications, config, controllerComponents, services)
   val controller = new EditsApi(auth, config, controllerComponents, services)
 

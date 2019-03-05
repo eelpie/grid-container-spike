@@ -1,6 +1,5 @@
 package com.gu.mediaservice.lib.play
 
-import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.config.{CommonConfig, Services}
 import com.gu.mediaservice.lib.management.Management
 import play.api.ApplicationLoader.Context
@@ -31,5 +30,4 @@ abstract class GridComponents(context: Context) extends BuiltInComponentsFromCon
   )
 
   val management = new Management(controllerComponents)
-  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
 }

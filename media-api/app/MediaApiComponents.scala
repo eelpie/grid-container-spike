@@ -1,4 +1,4 @@
-import com.gu.mediaservice.lib.auth.{GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler}
+import com.gu.mediaservice.lib.auth.{Authentication, GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler}
 import com.gu.mediaservice.lib.aws.{Kinesis, MessageSender, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.elasticsearch.ElasticSearchConfig
@@ -112,6 +112,9 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
     Logger.warn("No permissions handler is configured; granting all permissions to all users.")
     new GrantAllPermissionsHandler()
   }
+
+  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
+
 
   val mediaApi = new MediaApi(auth, messageSender, elasticSearch, imageResponse, config, controllerComponents, imageBucket,
     metrics, services, permissionsHandler)

@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.aws.{Kinesis, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
@@ -18,6 +19,7 @@ class LeasesComponents(context: Context) extends GridComponents(context) {
   val store = new LeaseStore(config)
   val notifications = new LeaseNotifier(publishers, store)
 
+  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
   val controller = new MediaLeaseController(auth, store, config, notifications, controllerComponents, services)
   override lazy val router = new Routes(httpErrorHandler, controller, management)
 }

@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.aws.{Kinesis, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.play.GridComponents
@@ -52,6 +53,8 @@ class UsageComponents(context: Context) extends GridComponents(context) {
     usageRecorder.stop()
     Future.successful(())
   })
+
+  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
 
   val controller = new UsageApi(auth, usageTable, usageGroup, notifications, config, usageRecorder, liveContentApi,
     controllerComponents, playBodyParsers, services)

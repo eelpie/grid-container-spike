@@ -1,3 +1,4 @@
+import com.gu.mediaservice.lib.auth.Authentication
 import com.gu.mediaservice.lib.aws.{Kinesis, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
 import com.gu.mediaservice.lib.imaging.ImageOperations
@@ -26,6 +27,7 @@ class ImageLoaderComponents(context: Context) extends GridComponents(context) {
   val optimisedPngOps = new OptimisedPngOps(store, config)
   val imageUploadOps = new ImageUploadOps(store, config, imageOperations, optimisedPngOps)
 
+  val auth = new Authentication(config, services, actorSystem, defaultBodyParser, wsClient, controllerComponents, executionContext)
   val controller = new ImageLoaderController(auth, downloader, store, notifications, config, imageUploadOps, controllerComponents, wsClient, services)
 
   override lazy val router = new Routes(httpErrorHandler, controller, management)
