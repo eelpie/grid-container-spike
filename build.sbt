@@ -77,12 +77,12 @@ lazy val imageLoader = playProject("image-loader", 9003).settings {
   import com.typesafe.sbt.packager.docker._
   Seq(
     libraryDependencies ++= Seq("com.squareup.okhttp3" % "okhttp" % "3.12.1"),
-    dockerBaseImage := "debian:jessie-backports",
+    dockerBaseImage := "openjdk:11-jre-stretch",  // addresses ca-cert issues with vanilla Debian and JDK 11
     dockerCommands ++= Seq(
       Cmd("USER", "root"),
       ExecCmd("RUN", "apt-get", "update"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "apt-utils"),
       ExecCmd("RUN", "apt-get", "upgrade", "-y"),
-      ExecCmd("RUN", "apt-get", "install", "-t", "jessie-backports", "-y", "openjdk-8-jre"),
       ExecCmd("RUN", "apt-get", "install", "-y", "graphicsmagick"),
       ExecCmd("RUN", "apt-get", "install", "-y", "graphicsmagick-imagemagick-compat"),
       ExecCmd("RUN", "apt-get", "install", "-y", "pngquant"),
@@ -148,7 +148,7 @@ def playProject(projectName: String, port: Int): Project = {
     .dependsOn(commonLib)
     .settings(commonSettings ++ Seq(
       playDefaultPort := port,
-      dockerBaseImage := "openjdk:8-jre",
+      dockerBaseImage := "openjdk:11-jre",
       dockerExposedPorts in Docker := Seq(port),
     ))
 }
