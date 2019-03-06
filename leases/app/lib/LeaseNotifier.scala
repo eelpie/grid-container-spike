@@ -38,7 +38,7 @@ class LeaseNotifier(publishers: Seq[MessageSenderVersion], store: LeaseStore) ex
 
   def sendReindexLeases(mediaId: String) = {
     val leases = store.getForMedia(mediaId)
-    publish(UpdateMessage(subject = "replace-image-leases", leases = Some(leases)))
+    publish(UpdateMessage(subject = "replace-image-leases", leases = Some(leases), id = Some(mediaId)))
   }
 
   def sendAddLease(mediaLease: MediaLease) = {
