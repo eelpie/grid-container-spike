@@ -7,16 +7,16 @@ class Services(val config: CommonConfig) {
   private val baseUrl = "https://" + baseHost
   val domainRoot = baseHost  // TODO this is been used a a login domain by auth
 
-  val kahunaBaseUri      = baseUrl + ":32105"
-  val apiBaseUri         = baseUrl + ":32101"
-  val loaderBaseUri      = baseUrl + ":32103"
-  val cropperBaseUri     = baseUrl + ":32106"
-  val metadataBaseUri    = baseUrl + ":32107"
-  val imgopsBaseUri      = baseUrl + ":32108"
-  val usageBaseUri       = baseUrl + ":80"  // TODO in use
-  val collectionsBaseUri = baseUrl + ":32110"
-  val leasesBaseUri      = baseUrl + ":32112"
-  val authBaseUri        = baseUrl + ":32111"
+  val kahunaBaseUri      = baseUrl + "/"
+  val apiBaseUri         = baseUrl + "/media-api"
+  val loaderBaseUri      = baseUrl + "/image-loader"
+  val cropperBaseUri     = baseUrl + "/cropper"
+  val metadataBaseUri    = baseUrl + "/metadata-editor"
+  val imgopsBaseUri      = baseUrl + "/imgops"
+  val usageBaseUri       = baseUrl + "/usages"
+  val collectionsBaseUri = baseUrl + "/collections"
+  val leasesBaseUri      = baseUrl + "/leases"
+  val authBaseUri        = baseUrl + "/auth"
 
 
   val apiHost = baseHost
