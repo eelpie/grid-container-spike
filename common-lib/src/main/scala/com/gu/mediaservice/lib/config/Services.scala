@@ -1,56 +1,33 @@
 package com.gu.mediaservice.lib.config
 
 class Services(val config: CommonConfig) {
-  val appName = "media"
 
-  val domainRoot = config.domainRoot
+  private val baseUrl = "http://10.0.45.11"
 
-  val kahunaHost: String   = s"$appName.$domainRoot"
-  val apiHost: String      = s"api.$appName.$domainRoot"
-  val loaderHost: String   = s"loader.$appName.$domainRoot"
-  val cropperHost: String  = s"cropper.$appName.$domainRoot"
-  val metadataHost: String = s"$appName-metadata.$domainRoot"
-  val imgopsHost: String   = s"$appName-imgops.$domainRoot"
-  val usageHost: String    = s"$appName-usage.$domainRoot"
-  val collectionsHost: String = s"$appName-collections.$domainRoot"
-  val leasesHost: String   = s"$appName-leases.$domainRoot"
-  val authHost: String     = s"$appName-auth.$domainRoot"
+  val domainRoot = "10.0.45.11" // TODO this is been used a a login domain by auth
 
-  val kahunaBaseUri      = baseUri(kahunaHost)
-  val apiBaseUri         = baseUri(apiHost)
-  val loaderBaseUri      = baseUri(loaderHost)
-  val cropperBaseUri     = baseUri(cropperHost)
-  val metadataBaseUri    = baseUri(metadataHost)
-  val imgopsBaseUri      = baseUri(imgopsHost)
-  val usageBaseUri       = baseUri(usageHost)
-  val collectionsBaseUri = baseUri(collectionsHost)
-  val leasesBaseUri      = baseUri(leasesHost)
-  val authBaseUri        = baseUri(authHost)
+  val kahunaBaseUri      = baseUrl + ":32105"
+  val apiBaseUri         = baseUrl + ":32101"
+  val loaderBaseUri      = baseUrl + ":32103"
+  val cropperBaseUri     = baseUrl + ":32106"
+  val metadataBaseUri    = baseUrl + ":32107"
+  val imgopsBaseUri      = baseUrl + ":32108"
+  val usageBaseUri       = baseUrl + ":80"  // TODO in use
+  val collectionsBaseUri = baseUrl + ":32110"
+  val leasesBaseUri      = baseUrl + ":32112"
+  val authBaseUri        = baseUrl + ":32111"
+
+
+  val apiHost = "10.0.45.11"
 
   val guardianWitnessBaseUri: String = "https://n0ticeapis.com"
 
-  val toolsDomains: Set[String] = if(config.isProd) {
-    Set(domainRoot)
-  } else {
-    Set(
-      domainRoot.replace("test", "local"),
-      domainRoot.replace("test", "code")
-    )
-  }
-
+  val toolsDomains: Set[String] = Set()
   // TODO move to config
   val corsAllowedTools: Set[String] = toolsDomains.foldLeft(Set[String]()) {(acc, domain) => {
-    val tools = Set(
-      baseUri(s"composer.$domain"),
-      baseUri(s"fronts.$domain")
-    )
-
-    acc ++ tools
+    acc
   }}
 
   val loginUriTemplate = s"$authBaseUri/login{?redirectUri}"
 
-  def baseUri(host: String) = {
-    s"https://$host"
-  }
 }
