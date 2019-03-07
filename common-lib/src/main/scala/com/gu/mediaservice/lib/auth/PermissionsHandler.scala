@@ -39,5 +39,3 @@ class GuardianEditorialPermissionsHandler(bucket: String, stage: String, config:
   }
 
 }
-
-object PermissionDeniedError extends Throwable("Permission denied")
