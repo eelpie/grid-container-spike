@@ -19,7 +19,7 @@ class Services(val config: CommonConfig) {
   val authBaseUri        = baseUrl + ":32111"
 
 
-  val apiHost = "10.0.45.11"
+  val apiHost = baseHost
 
   val guardianWitnessBaseUri: String = "https://n0ticeapis.com"
 
