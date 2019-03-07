@@ -4,7 +4,7 @@ class Services(val config: CommonConfig) {
 
   val baseHost = "grid.eelpieconsulting.co.uk"
 
-  private val baseUrl = "http://" + baseHost
+  private val baseUrl = "https://" + baseHost
   val domainRoot = baseHost  // TODO this is been used a a login domain by auth
 
   val kahunaBaseUri      = baseUrl + ":32105"
