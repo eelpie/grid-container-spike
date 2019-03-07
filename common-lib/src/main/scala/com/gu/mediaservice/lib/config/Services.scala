@@ -2,9 +2,10 @@ package com.gu.mediaservice.lib.config
 
 class Services(val config: CommonConfig) {
 
-  private val baseUrl = "http://10.0.45.11"
+  val baseHost = "grid.eelpieconsulting.co.uk"
 
-  val domainRoot = "10.0.45.11" // TODO this is been used a a login domain by auth
+  private val baseUrl = "http://" + baseHost
+  val domainRoot = baseHost  // TODO this is been used a a login domain by auth
 
   val kahunaBaseUri      = baseUrl + ":32105"
   val apiBaseUri         = baseUrl + ":32101"
