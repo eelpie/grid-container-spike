@@ -147,7 +147,8 @@ class CropperController(auth: Authentication, crops: Crops, store: CropStore, no
 
     case class HttpClientResponse(status: Int, statusText: String, json: JsValue)
 
-    val actualApiServiceUri = new URIBuilder(uri).setScheme("http").setHost("media-api.default.svc.cluster.local").setPort(9001).build()
+    val idSegment = uri.replaceAll(".*/image/", "/image/")
+    val actualApiServiceUri = new URIBuilder(uri).setScheme("http").setHost("media-api.default.svc.cluster.local").setPort(9001).setPath(idSegment).build()
     Logger.info("Making call to API on URL: " + actualApiServiceUri)
 
     val responseFuture = ws.url(actualApiServiceUri.toString).
