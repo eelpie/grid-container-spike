@@ -1,4 +1,5 @@
-import PlayKeys._
+import play.sbt.PlayImport.PlayKeys._
+
 import scala.sys.process._
 
 val commonSettings = Seq(
@@ -70,13 +71,28 @@ lazy val auth = playProject("auth", 9011)
 
 lazy val collections = playProject("collections", 9010)
 
-lazy val cropper = playProject("cropper", 9006)
+lazy val cropper = playProject("cropper", 9006).settings {
+  import com.typesafe.sbt.packager.docker._
+  Seq(
+    dockerBaseImage := "openjdk:11-jre-stretch", // addresses ca-cert issues with vanilla Debian and JDK 11
+    dockerCommands ++= Seq(
+      Cmd("USER", "root"),
+      ExecCmd("RUN", "apt-get", "update"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "apt-utils"),
+      ExecCmd("RUN", "apt-get", "upgrade", "-y"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "graphicsmagick"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "graphicsmagick-imagemagick-compat"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "pngquant"),
+      ExecCmd("RUN", "apt-get", "install", "-y", "libimage-exiftool-perl")
+    )
+  )
+}
 
 lazy val imageLoader = playProject("image-loader", 9003).settings {
   import com.typesafe.sbt.packager.docker._
   Seq(
     libraryDependencies ++= Seq("com.squareup.okhttp3" % "okhttp" % "3.12.1"),
-    dockerBaseImage := "openjdk:11-jre-stretch",  // addresses ca-cert issues with vanilla Debian and JDK 11
+    dockerBaseImage := "openjdk:11-jre-stretch", // addresses ca-cert issues with vanilla Debian and JDK 11
     dockerCommands ++= Seq(
       Cmd("USER", "root"),
       ExecCmd("RUN", "apt-get", "update"),
