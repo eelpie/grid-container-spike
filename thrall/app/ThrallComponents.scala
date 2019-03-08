@@ -1,5 +1,4 @@
 import com.gu.mediaservice.lib.config.Services
-import com.gu.mediaservice.lib.elasticsearch.ElasticSearchConfig
 import com.gu.mediaservice.lib.elasticsearch6.ElasticSearch6Config
 import com.gu.mediaservice.lib.logging.GridLogger
 import com.gu.mediaservice.lib.play.GridComponents
@@ -24,19 +23,6 @@ class ThrallComponents(context: Context) extends GridComponents(context) {
     new NullThrallMetrics
   }
 
-  val es1Config = for {
-    h <- config.elasticsearchHost
-    p <- config.elasticsearchPort
-    c <- config.elasticsearchCluster
-  } yield {
-    ElasticSearchConfig(
-      alias = config.writeAlias,
-      host = h,
-      port = p,
-      cluster = c
-    )
-  }
-
   val es6Config =
     for {
       h <- config.elasticsearch6Host
@@ -56,12 +42,6 @@ class ThrallComponents(context: Context) extends GridComponents(context) {
   }
 
   val elasticSearches = Seq(
-    es1Config.map { c =>
-      Logger.info("Configuring ES1: " + c)
-      val es1 = new ElasticSearch(c, metrics)
-      es1.ensureAliasAssigned()
-      es1
-    },
     es6Config.map { c =>
       Logger.info("Configuring ES6: " + c)
       val es6 = new ElasticSearch6(c, metrics)
@@ -75,7 +55,7 @@ class ThrallComponents(context: Context) extends GridComponents(context) {
 
   val syndicationOps = new SyndicationRightsOps(es)
 
-  val thrallMessageConsumer = new ThrallMessageConsumer(config, elasticSearches.head, store,
+  val thrallMessageConsumer = new ThrallMessageConsumer(config, es, store,
     dynamoNotifications, syndicationOps, metrics)
   thrallMessageConsumer.startSchedule()
   context.lifecycle.addStopHook {

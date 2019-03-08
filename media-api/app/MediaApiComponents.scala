@@ -1,7 +1,6 @@
 import com.gu.mediaservice.lib.auth.{Authentication, GrantAllPermissionsHandler, GuardianEditorialPermissionsHandler}
 import com.gu.mediaservice.lib.aws.{Kinesis, MessageSender, MessageSenderVersion, SNS}
 import com.gu.mediaservice.lib.config.Services
-import com.gu.mediaservice.lib.elasticsearch.ElasticSearchConfig
 import com.gu.mediaservice.lib.elasticsearch6.ElasticSearch6Config
 import com.gu.mediaservice.lib.imaging.ImageOperations
 import com.gu.mediaservice.lib.management.ManagementWithPermissions
@@ -34,17 +33,6 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
     new NullMediaApiMetrics
   }
 
-  val es1Config: Option[ElasticSearchConfig] = for {
-    h <- config.elasticsearchHost
-    p <- config.elasticsearchPort
-    c <- config.elasticsearchCluster
-  } yield {
-    ElasticSearchConfig(alias = config.imagesAlias,
-      host = h,
-      port = p,
-      cluster = c
-    )
-  }
 
   val es6Config: Option[ElasticSearch6Config] = for {
     h <- config.elasticsearch6Host
@@ -64,12 +52,6 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
   }
 
   val elasticSearches = Seq(
-    es1Config.map { c =>
-      Logger.info("Configuring ES1: " + c)
-      val es1 = new lib.elasticsearch.impls.elasticsearch1.ElasticSearch(config, metrics, c)
-      es1.ensureAliasAssigned()
-      es1
-    },
     es6Config.map { c =>
       Logger.info("Configuring ES6: " + c)
       val es6 = new lib.elasticsearch.impls.elasticsearch6.ElasticSearch(config, metrics, c)
