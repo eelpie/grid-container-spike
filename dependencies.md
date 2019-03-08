@@ -59,6 +59,14 @@ Internal
 
 
 
+
+```
+kubectl create configmap imgops --from-file=imgops/nginx.conf
+```
+
+
+
+
 ## Optional dependencies
 
 ## Cloudfront
