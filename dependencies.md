@@ -9,6 +9,14 @@ The specifices of how todo this have been deliberately left up to to the you.
 If you are evaluating the Grid them it's probably a useful exercise to build out and understand these dependencies.
 
 
+## An OAuth provider for sign in
+
+The PANDA signin system will require a 3rd party OAuth provider;
+typically this will be a Google Cloud Platform project.
+
+TODO instructions
+
+
 ## AWS S3 image buckets
 
 AWS S3 buckets are the Grid's primary input and outputs.
