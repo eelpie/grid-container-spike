@@ -7,7 +7,7 @@ class Services(val config: CommonConfig) {
   private val baseUrl = "https://" + baseHost
   val domainRoot = baseHost  // TODO this is been used a a login domain by auth
 
-  val kahunaBaseUri      = baseUrl + "/"
+  val kahunaBaseUri      = baseUrl + ""
   val apiBaseUri         = baseUrl + "/media-api"
   val loaderBaseUri      = baseUrl + "/image-loader"
   val cropperBaseUri     = baseUrl + "/cropper"
