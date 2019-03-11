@@ -23,7 +23,7 @@ class S3(config: CommonConfig) {
   type Key = String
   type UserMetadata = Map[String, String]
 
-  val s3Endpoint = "s3.amazonaws.com"
+  val s3Endpoint = config.s3EndPoint
 
   lazy val client: AmazonS3 = buildS3Client()
 
