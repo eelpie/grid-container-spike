@@ -20,6 +20,7 @@ import lib.elasticsearch._
 import lib.imagebuckets.S3ImageBucket
 import org.http4s.UriTemplate
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.http.HttpEntity
 import play.api.libs.json._
 import play.api.mvc.Security.AuthenticatedRequest
@@ -118,6 +119,15 @@ class MediaApi(
   private def hasPermission(request: Authentication.Request[Any], image: Image): Boolean = request.user.apiKey.tier match {
     case Syndication => isAvailableForSyndication(image)
     case _ => true
+  }
+
+  def reindex = auth.async { request =>
+      imageS3Client.listAll.map{ images =>
+        images.foreach{ i =>
+          Logger.info("Found image: " + i.uri)
+        }
+        Ok
+      }
   }
 
   def getImage(id: String) = auth.async { request =>

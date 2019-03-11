@@ -33,7 +33,6 @@ class MediaApiComponents(context: Context) extends GridComponents(context) {
     new NullMediaApiMetrics
   }
 
-
   val es6Config: Option[ElasticSearch6Config] = for {
     h <- config.elasticsearch6Host
     p <- config.elasticsearch6Port
