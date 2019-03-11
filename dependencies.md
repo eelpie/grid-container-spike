@@ -34,6 +34,7 @@ This is a private bucket used by the Grid UI.
 ### Crops bucket
 
 Crops exported from the Grid and published here.
+
 This bucket should be a public docroot.
 
 
@@ -111,7 +112,13 @@ kubectl create configmap imgops --from-file=imgops/nginx.conf
 
 Apply the following to deploy the Grid services into your cluster. The deployment will pick up configuration from the cluster configmaps you installed above.
 
+```
+kubectl apply -f https://raw.githubusercontent.com/eelpie/grid-container-spike/master/grid.yaml
+```
+
 By doing this you are downloading and running unofficial 3rd party container images.
+
+
 
 Confirm the services are running.
 
