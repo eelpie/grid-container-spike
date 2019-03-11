@@ -14,7 +14,7 @@ class S3ImageBucket(config: MediaApiConfig, bucket: String) extends S3(config) w
   }
 
   def listAll()(implicit ex: ExecutionContext): Future[List[S3Object]] = {
-    this.list(this.bucket, "")
+    this.list(this.bucket)
   }
 
 }

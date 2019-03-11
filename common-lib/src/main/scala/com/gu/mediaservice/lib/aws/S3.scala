@@ -10,6 +10,7 @@ import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.gu.mediaservice.lib.config.CommonConfig
 import com.gu.mediaservice.model.Image
 import org.joda.time.{DateTime, Duration}
+import play.api.Logger
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -109,10 +110,10 @@ class S3(config: CommonConfig) {
       )
     }
 
-  def list(bucket: Bucket, prefixDir: String)
+  def list(bucket: Bucket)
           (implicit ex: ExecutionContext): Future[List[S3Object]] =
     Future {
-      val req = new ListObjectsRequest().withBucketName(bucket).withPrefix(s"$prefixDir/")
+      val req = new ListObjectsRequest().withBucketName(bucket)
       val listing = client.listObjects(req)
       val summaries = listing.getObjectSummaries.asScala
       summaries.map(summary => (summary.getKey, summary)).foldLeft(List[S3Object]()) {
