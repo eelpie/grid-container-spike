@@ -60,6 +60,11 @@ Update events intended for thrall.
 Update events intended for meta-data editor.
 
 
+## Dynamo Tables
+
+collections, image-collections, leases and metadata
+crops?
+
 ## PANDA Auth configuration bucket
 
 
@@ -103,6 +108,7 @@ Review the supplied configuration files and localise them with the details of yo
 Load your configuration into your cluster as config maps
 
 ```
+kubectl create configmap leases --from-file=leases/application.conf 
 kubectl create configmap imgops --from-file=imgops/nginx.conf
 ```
 
