@@ -123,6 +123,7 @@ class MediaApi(
 
   def reindex = auth.async { request =>
       imageS3Client.listAll.map{ images =>
+        Logger.info("List all got " + images.size + " images")
         images.foreach{ i =>
           Logger.info("Found image: " + i.uri)
         }
