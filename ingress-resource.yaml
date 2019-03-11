@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: grid-ingress
+  annotations:
+    nginx.org/rewrites: "serviceName=image-loader rewrite=/; serviceName=thrall rewrite=/; serviceName=media-api rewrite=/; serviceName=auth rewrite=/; serviceName=metadata-editor rewrite=/; serviceName=imgops rewrite=/; serviceName=cropper rewrite=/;"
+    nginx.org/client-max-body-size: "0"
+spec:
+  tls:
+  - hosts:
+    - grid.eelpieconsulting.co.uk
+    secretName: eelpie-20201006
+  rules:
+  - host: grid.eelpieconsulting.co.uk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kahuna
+          servicePort: 9005
+      - path: /auth/
+        backend:
+          serviceName: auth
+          servicePort: 9011
+      - path: /cropper/
+        backend:
+          serviceName: cropper
+          servicePort: 9006
+      - path: /image-loader/
+        backend:
+          serviceName: image-loader
+          servicePort: 9003
+      - path: /imgops/
+        backend:
+          serviceName: imgops
+          servicePort: 80
+      - path: /media-api/
+        backend:
+          serviceName: media-api
+          servicePort: 9001
+      - path: /metadata-editor/
+        backend:
+          serviceName: metadata-editor
+          servicePort: 9007
+      - path: /thrall/
+        backend:
+          serviceName: thrall
+          servicePort: 9002

@@ -1,0 +1,424 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+spec:
+  type: NodePort
+  selector:
+    app: auth
+  ports:
+    - port: 9011
+      name: auth
+      nodePort: 32111
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: auth
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: eelpie/auth:latest
+          ports:
+            - containerPort: 9011
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/docker/conf
+          resources:
+            limits:
+              memory: "256Mi"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: auth
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collections
+spec:
+  type: NodePort
+  selector:
+    app: collections
+  ports:
+    - port: 9010
+      name: collections
+      nodePort: 32110
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: collections
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: collections
+    spec:
+      containers:
+        - name: collections
+          image: eelpie/collections:latest
+          ports:
+            - containerPort: 9010
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/docker/conf
+      volumes:
+        - name: config-volume
+          configMap:
+            name: collections
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cropper
+spec:
+  type: NodePort
+  selector:
+    app: cropper
+  ports:
+    - port: 9006
+      name: cropper
+      nodePort: 32106
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cropper
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cropper
+    spec:
+      containers:
+        - name: cropper
+          image: eelpie/cropper:latest
+          ports:
+            - containerPort: 9006
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/docker/conf
+            - name: profiles-volume
+              mountPath: /opt/docker/profiles
+          resources:
+            limits:
+              memory: "512Mi"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: cropper
+        - name: profiles-volume
+          configMap:
+            name: profiles
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: image-loader
+spec:
+  type: NodePort
+  selector:
+    app: image-loader
+  ports:
+    - port: 9003
+      name: image-loader
+      nodePort: 32103
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: image-loader
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: image-loader
+    spec:
+      containers:
+        - name: image-loader
+          image: eelpie/image-loader:latest
+          ports:
+            - containerPort: 9003
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/docker/conf
+            - name: profiles-volume
+              mountPath: /opt/docker/profiles
+          resources:
+            limits:
+              memory: "512Mi"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: image-loader
+        - name: profiles-volume
+          configMap:
+            name: profiles
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: imgops
+spec:
+  selector:
+    app: imgops
+  ports:
+    - protocol: TCP
+      port: 80
+      nodePort: 32108
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: imgops
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: imgops
+    spec:
+      containers:
+        - name: imgops
+          image: eelpie/imgops:latest
+          ports:
+          - containerPort: 80
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+          resources:
+            limits:
+              memory: "256Mi"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: imgops
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kahuna
+spec:
+  type: NodePort
+  selector:
+    app: kahuna
+  ports:
+    - port: 9005
+      name: kahuna
+      nodePort: 32105
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kahuna
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kahuna
+    spec:
+      containers:
+        - name: kahuna
+          image: eelpie/kahuna:latest
+          ports:
+            - containerPort: 9005
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/docker/conf
+          resources:
+            limits:
+              memory: "256Mi"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: kahuna
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: leases
+spec:
+  type: NodePort
+  selector:
+    app: leases
+  ports:
+    - port: 9012
+      name: leases
+      nodePort: 32112
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: leases
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: leases
+    spec:
+      containers:
+        - name: leases
+          image: eelpie/leases:latest
+          ports:
+            - containerPort: 9012
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/docker/conf
+      volumes:
+        - name: config-volume
+          configMap:
+            name: leases
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: media-api
+spec:
+  type: NodePort
+  selector:
+    app: media-api
+  ports:
+    - port: 9001
+      name: media-api
+      nodePort: 32101
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: media-api
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: media-api
+    spec:
+      containers:
+        - name: media-api
+          image: eelpie/media-api:latest
+          ports:
+            - containerPort: 9001
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/docker/conf
+          resources:
+            limits:
+              memory: "512Mi"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: media-api
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metadata-editor
+spec:
+  type: NodePort
+  selector:
+    app: metadata-editor
+  ports:
+    - port: 9007
+      name: metadata-editor
+      nodePort: 32107
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: metadata-editor
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: metadata-editor
+    spec:
+      containers:
+        - name: metadata-editor
+          image: eelpie/metadata-editor:latest
+          ports:
+            - containerPort: 9007
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/docker/conf
+          resources:
+            limits:
+              memory: "256Mi"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: metadata-editor
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thrall
+spec:
+  type: NodePort
+  selector:
+    app: thrall
+  ports:
+    - port: 9002
+      name: thrall
+      nodePort: 32102
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: thrall
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: thrall
+    spec:
+      containers:
+        - name: thrall
+          image: eelpie/thrall:latest
+          ports:
+            - containerPort: 9002
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/docker/conf
+          resources:
+            limits:
+              memory: "256Mi"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: thrall
+      imagePullSecrets:
+      - name: regsecret
