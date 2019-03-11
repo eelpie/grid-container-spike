@@ -23,6 +23,7 @@ import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.HttpEntity
 import play.api.libs.json._
+import play.api.libs.ws.WSClient
 import play.api.mvc.Security.AuthenticatedRequest
 import play.api.mvc._
 
@@ -38,7 +39,8 @@ class MediaApi(
                 imageS3Client: S3ImageBucket,
                 mediaApiMetrics: MediaApiMetrics,
                 services: Services,
-                permissionsHandler: PermissionsHandler
+                permissionsHandler: PermissionsHandler,
+                ws: WSClient
               )(implicit val ec: ExecutionContext) extends BaseController with ArgoHelpers {
 
   private val searchParamList = List("q", "ids", "offset", "length", "orderBy",
@@ -126,6 +128,7 @@ class MediaApi(
         Logger.info("List all got " + images.size + " images")
         images.foreach{ i =>
           Logger.info("Found image: " + i.uri)
+          // Stream and post to image loader for ingesting
         }
         Ok
       }
