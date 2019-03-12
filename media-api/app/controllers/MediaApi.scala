@@ -137,8 +137,11 @@ class MediaApi(
           val contentSource = StreamConverters.fromInputStream(() => s3Object.getObjectContent)
           val contentLength = s3Object.getObjectMetadata.getContentLength
 
+
           Logger.info("Posting to image loader: " + contentLength)
-          ws.url("http://image-loader.default.svc.cluster.local:9003/images").post(contentSource).map { r =>
+          ws.url("http://image-loader.default.svc.cluster.local:9003/images").addHttpHeaders(("Content-Length", contentLength.toString)).
+            post(contentSource).
+            map { r =>
             Logger.info("Image loader response: + " + r.status + ": " + r.body)
           }
         }
