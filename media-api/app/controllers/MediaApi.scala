@@ -132,11 +132,12 @@ class MediaApi(
           // Stream and post to image loader for ingesting
 
           val s3Object = imageS3Client.getImage(i.uri)
-          Logger.info("Got S3 object for image: " + s3Object)
+          Logger.info("Got S3 object for image: " + s3Object + " " + s3Object.getObjectMetadata)
 
           val contentSource = StreamConverters.fromInputStream(() => s3Object.getObjectContent)
+          val contentLength = s3Object.getObjectMetadata.getContentLength
 
-          Logger.info("Posting to image loader")
+          Logger.info("Posting to image loader: " + contentLength)
           ws.url("http://image-loader.default.svc.cluster.local:9003/images").post(contentSource).map { r =>
             Logger.info("Image loader response: + " + r.status + ": " + r.body)
           }
