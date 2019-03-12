@@ -3,6 +3,7 @@ package controllers
 import java.net.URI
 
 import akka.stream.scaladsl.StreamConverters
+import com.amazonaws.services.s3.model.S3ObjectInputStream
 import com.gu.mediaservice.lib.argo._
 import com.gu.mediaservice.lib.argo.model._
 import com.gu.mediaservice.lib.auth.Authentication.{AuthenticatedService, PandaUser, Principal}
@@ -129,6 +130,16 @@ class MediaApi(
         images.foreach{ i =>
           Logger.info("Found image: " + i.uri)
           // Stream and post to image loader for ingesting
+
+          val s3Object = imageS3Client.getImage(i.uri)
+          Logger.info("Got S3 object for image: " + s3Object)
+
+          val contentSource = StreamConverters.fromInputStream(() => s3Object.getObjectContent)
+
+          Logger.info("Posting to image loader")
+          ws.url("http://image-loader.default.svc.cluster.local:9003/images").post(contentSource).map { r =>
+            Logger.info("Image loader response: + " + r.status + ": " + r.body)
+          }
         }
         Ok
       }
