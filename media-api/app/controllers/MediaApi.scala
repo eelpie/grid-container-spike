@@ -137,9 +137,13 @@ class MediaApi(
           val contentSource = StreamConverters.fromInputStream(() => s3Object.getObjectContent)
           val contentLength = s3Object.getObjectMetadata.getContentLength
 
+          val mediaApiKey = auth.keyStore.findKey("cropper").getOrElse(throw new Error("Missing cropper API key in key bucket"))  // TODO
 
           Logger.info("Posting to image loader: " + contentLength)
-          ws.url("http://image-loader.default.svc.cluster.local:9003/images").addHttpHeaders(("Content-Length", contentLength.toString)).
+          ws.url("http://image-loader.default.svc.cluster.local:9003/images").
+            addHttpHeaders(("Content-Length", contentLength.toString)).
+            addHttpHeaders(("X-Gu-Media-Key", mediaApiKey)).
+
             post(contentSource).
             map { r =>
             Logger.info("Image loader response: + " + r.status + ": " + r.body)
