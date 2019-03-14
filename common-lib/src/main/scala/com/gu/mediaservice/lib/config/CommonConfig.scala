@@ -38,7 +38,7 @@ trait CommonConfig {
 
   lazy val awsRegion = configuration.getOptional[String]("aws.region").getOrElse("eu-west-1")
 
-  def s3EndPoint: String = "s3.amazonaws.com" // TODO push down to the services which actually use it
+  def s3EndPoint: String = configuration.getOptional[String]("s3.endpoint").getOrElse("s3.amazonaws.com") // TODO push down to the services which actually use it
 
   def withAWSCredentials[T, S <: AwsClientBuilder[S, T]](builder: AwsClientBuilder[S, T]): S = builder
     .withRegion(awsRegion)

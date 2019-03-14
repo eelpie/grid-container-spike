@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: grid-ingress
   annotations:
-    nginx.org/rewrites: "serviceName=image-loader rewrite=/; serviceName=thrall rewrite=/; serviceName=media-api rewrite=/; serviceName=auth rewrite=/; serviceName=metadata-editor rewrite=/; serviceName=imgops rewrite=/; serviceName=cropper rewrite=/;"
+    nginx.org/rewrites: "serviceName=image-loader rewrite=/; serviceName=thrall rewrite=/; serviceName=media-api rewrite=/; serviceName=auth rewrite=/; serviceName=metadata-editor rewrite=/; serviceName=imgops rewrite=/; serviceName=cropper rewrite=/; serviceName=leases rewrite=/; serviceName=collections rewrite=/;"
     nginx.org/client-max-body-size: "0"
 spec:
   tls:
@@ -22,6 +22,10 @@ spec:
         backend:
           serviceName: auth
           servicePort: 9011
+      - path: /collections/
+        backend:
+          serviceName: collections
+          servicePort: 9010
       - path: /cropper/
         backend:
           serviceName: cropper
@@ -34,6 +38,10 @@ spec:
         backend:
           serviceName: imgops
           servicePort: 80
+      - path: /leases/
+        backend:
+          serviceName: leases
+          servicePort: 9012
       - path: /media-api/
         backend:
           serviceName: media-api

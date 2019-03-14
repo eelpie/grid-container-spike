@@ -37,8 +37,6 @@ spec:
         - name: config-volume
           configMap:
             name: auth
-      imagePullSecrets:
-      - name: regsecret
 ---
 apiVersion: v1
 kind: Service
@@ -72,12 +70,13 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /opt/docker/conf
+          resources:
+            limits:
+              memory: "256Mi"
       volumes:
         - name: config-volume
           configMap:
             name: collections
-      imagePullSecrets:
-      - name: regsecret
 ---
 apiVersion: v1
 kind: Service
@@ -123,8 +122,6 @@ spec:
         - name: profiles-volume
           configMap:
             name: profiles
-      imagePullSecrets:
-      - name: regsecret
 ---
 apiVersion: v1
 kind: Service
@@ -170,8 +167,6 @@ spec:
         - name: profiles-volume
           configMap:
             name: profiles
-      imagePullSecrets:
-      - name: regsecret
 ---
 apiVersion: v1
 kind: Service
@@ -213,8 +208,6 @@ spec:
         - name: config-volume
           configMap:
             name: imgops
-      imagePullSecrets:
-      - name: regsecret
 ---
 apiVersion: v1
 kind: Service
@@ -255,8 +248,6 @@ spec:
         - name: config-volume
           configMap:
             name: kahuna
-      imagePullSecrets:
-      - name: regsecret
 ---
 apiVersion: v1
 kind: Service
@@ -290,12 +281,13 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /opt/docker/conf
+          resources:
+            limits:
+              memory: "256Mi"
       volumes:
         - name: config-volume
           configMap:
             name: leases
-      imagePullSecrets:
-      - name: regsecret
 ---
 apiVersion: v1
 kind: Service
@@ -336,8 +328,6 @@ spec:
         - name: config-volume
           configMap:
             name: media-api
-      imagePullSecrets:
-      - name: regsecret
 ---
 apiVersion: v1
 kind: Service
@@ -378,8 +368,6 @@ spec:
         - name: config-volume
           configMap:
             name: metadata-editor
-      imagePullSecrets:
-      - name: regsecret
 ---
 apiVersion: v1
 kind: Service
@@ -420,5 +408,3 @@ spec:
         - name: config-volume
           configMap:
             name: thrall
-      imagePullSecrets:
-      - name: regsecret

@@ -174,7 +174,7 @@ By doing this you are downloading and running unofficial 3rd party container ima
 The deployment will pick up configuration from the cluster config maps you installed above.
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/eelpie/grid-container-spike/master/grid.yaml
+kubectl apply -f https://raw.githubusercontent.com/eelpie/grid-container-spike/master/kubernetes/grid.yaml
 ```
 
 Confirm the services are registered:
