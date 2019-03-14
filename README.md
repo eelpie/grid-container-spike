@@ -48,7 +48,7 @@ If you are evaluating the Grid them it's probably a useful exercise to build out
 
 ### An OAuth provider for sign in
 
-The Grid uses the [https://github.com/guardian/pan-domain-authentication](Guardian's Panda authentication system).
+The Grid uses the [Guardian's Panda authentication system](https://github.com/guardian/pan-domain-authentication).
 Panda requires a 3rd party OAuth provider; typically this will be a Google Cloud Platform project.
 
 TODO instructions
