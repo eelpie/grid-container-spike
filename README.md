@@ -141,12 +141,12 @@ Self signed certificates might work but your mileage may vary.
 
 ## Configuration
 
-Review the supplied configuration files and localise them with the details of your AWS dependencies from above.
+Review the [skeleton configuration files](kubernetes/) and localise them with the details of your AWS dependencies from above.
 
 Load your configuration into your cluster as config maps
 
 ```
-cd kubernetes/conf
+cd kubernetes
 
 kubectl create configmap auth --from-file=auth/application.conf
 kubectl create configmap collections --from-file=collections/application.conf
