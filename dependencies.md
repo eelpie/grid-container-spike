@@ -10,18 +10,16 @@ The Guardian deployment assumes that various configuration files will be availab
 This is incompatible with the idea that the configuration should be provided by the container orchestrator.
 
 The Grid applications are Play framework applications. We'd like move all the configuration back to standard Play
-application.conf files with one file per application. We're happy to tollerate some duplication in the configuration
+application.conf files with one file per application. We're happy to tolerate some duplication in the configuration
 as this helps to document the dependencies which each specific deployable really needs.
 
-Specifically, we've removed the dependencies on /etc/gu and the Guardian native format .properties files. EC2 access is migrated
-from profiles to access keys.
+Specifically, we've removed the dependencies on /etc/gu and the Guardian native format .properties files. EC2 access is migrated from profiles to access keys.
 
 
-## Disabling optional features with differcult dependencies
+## Disabling optional features with difficult dependencies
 
 To enable the simplest possible unboxing some advanced features with differcult dependencies have been feature toggled off.
-These include Cloud Front thumbnails, permissions, costs and Cloud Watch metrics. These features can be reenabled by
-provisioning their dependencies and then configuring them.
+These include Cloud Front thumbnails, permissions, costs and Cloud Watch metrics. These features can be renabled by provisioning their dependencies and then configuring them.
 
 
 ## Publishing public Docker images
@@ -30,9 +28,10 @@ With all of user specific configuration removed from the Docker images it's safe
 This makes then available for use by users who do not wish to build their own deployables, speeding up the unboxing experience.
 
 
-## Remapping servives onto a single hostname
+## Remapping services onto a single hostname
 
-Making it easier to obtain the required SSL certificate.
+The Guardian deployment maps each service to a unique hostname; this ingress used here maps services to sub paths on the same hostname as the UI.
+This makes it easier to obtain the required SSL certificate.
 
 
 # Setup
@@ -101,7 +100,6 @@ Update events intended for meta-data editor.
 ### Dynamo Tables
 
 collections, image-collections, leases and metadata
-crops?
 
 
 ### PANDA Auth configuration bucket
@@ -141,9 +139,7 @@ The PANDA auth system mandates secure cookies, hence the requirement for SSL eve
 Self signed certificates might work but your mileage may vary.
 
 
-
 ## Configuration
-
 
 Review the supplied configuration files and localise them with the details of your AWS dependencies from above.
 
@@ -152,10 +148,23 @@ Load your configuration into your cluster as config maps
 ```
 cd kubernetes/conf
 
-kubectl create configmap leases --from-file=leases/application.conf 
+kubectl create configmap auth --from-file=auth/application.conf
+kubectl create configmap collections --from-file=collections/application.conf
+kubectl create configmap cropper --from-file=cropper/application.conf
+kubectl create configmap image-loader --from-file=cropper/application.conf
 kubectl create configmap imgops --from-file=imgops/nginx.conf
+kubectl create configmap kahuna --from-file=kahuna/application.conf
+kubectl create configmap leases --from-file=leases/application.conf
+kubectl create configmap media-api --from-file=media-api/application.conf
+kubectl create configmap metadata-editor --from-file=metadata-editor/application.conf
+kubectl create configmap thrall --from-file=thrall/application.cond
 ```
 
+Colour profiles are supplied as configuration:
+
+```
+kubectl create configmap profiles --from-file=profiles
+```
 
 
 ## Install the Grid components
@@ -168,19 +177,56 @@ The deployment will pick up configuration from the cluster config maps you insta
 kubectl apply -f https://raw.githubusercontent.com/eelpie/grid-container-spike/master/grid.yaml
 ```
 
-Confirm the services are running.
+Confirm the services are registered:
+
+```
+kubectl get services
+auth               NodePort    10.99.200.175    <none>        9011:32111/TCP   13s
+collections        NodePort    10.111.153.73    <none>        9010:32110/TCP   13s
+cropper            NodePort    10.100.178.10    <none>        9006:32106/TCP   13s
+image-loader       NodePort    10.104.139.51    <none>        9003:32103/TCP   13s
+imgops             NodePort    10.98.11.134     <none>        80:32108/TCP     13s
+kahuna             NodePort    10.103.44.54     <none>        9005:32105/TCP   13s
+leases             NodePort    10.104.113.30    <none>        9012:32112/TCP   13s
+media-api          NodePort    10.105.126.161   <none>        9001:32101/TCP   13s
+metadata-editor    NodePort    10.97.64.111     <none>        9007:32107/TCP   13s
+thrall             NodePort    10.102.15.69     <none>        9002:32102/TCP   13s
+```
+
+And that the pods have started:
+
+```
+tony@kubernetes:~/git/kubernetes/grid$ kubectl get pods
+NAME                                READY   STATUS              RESTARTS   AGE
+auth-5f6bccdf65-pxh5m               0/1     ContainerCreating   0          100s
+collections-6794d66cb8-c7k6d        0/1     ContainerCreating   0          100s
+cropper-58d8f98fc7-g9wmm            0/1     ContainerCreating   0          100s
+image-loader-ccc5cb76-p9hp4         0/1     ContainerCreating   0          100s
+imgops-579597f775-lkwgw             0/1     ContainerCreating   0          100s
+kahuna-f87c9d68d-gsg9l              0/1     ContainerCreating   0          100s
+leases-86d6d5bd98-flmlg             0/1     ContainerCreating   0          99s
+media-api-bc4b47f8-mkvlj            0/1     ContainerCreating   0          99s
+metadata-editor-84bb8b79b-fgvk9     0/1     ContainerCreating   0          99s
+thrall-5c47c5b4ff-9xk8q             0/1     ContainerCreating   0          99s
+```
 
 
 ### Ingress
 
 Ensure that your cluster has a functioning Ingress controller.
-This isn't straight forward but nginx works for a local deployment.
+This isn't straight forward but [NGINX Ingress Controller](https://github.com/nginxinc/kubernetes-ingress) works for a local deployment.
 
 Install your SSL certificate as a cluster secret
 
+```
+kubectl create secret tls grid-ssl-secret --key privkey.pem --cert fullchain.pem
+```
+
 Localise and apply the supplied ingress resource.
+This ingress resource has been tested with the NGINX Ingress Controller; milage will almost certainly vary with Cloud ingress controllers.
 
 ```
+kubectl apply -f ingress-resource.yaml
 ```
 
 Confirm that the ingress is working by hitting the cluster with a browser
@@ -188,4 +234,3 @@ Confirm that the ingress is working by hitting the cluster with a browser
 ```
 https://grid.eelpieconsulting.co.uk
 ```
-
